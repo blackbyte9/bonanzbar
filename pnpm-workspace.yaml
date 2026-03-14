@@ -8,5 +8,6 @@ ignoredBuiltDependencies:
 
 onlyBuiltDependencies:
   - '@prisma/engines'
+  - core-js
   - msw
   - prisma
