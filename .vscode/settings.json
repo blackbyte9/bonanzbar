@@ -3,8 +3,16 @@
         "Bonanzbar"
     ],
     "cSpell.ignorePaths": [
+        ".gitignore",
         "tsconfig.json",
         "components.json",
         "eslint.config.mjs",
+        "package.json",
+        "pnpm-workspace.yaml",
+        "pnpm-lock.yaml",
+        "prisma/schema.prisma",
+        "src/prisma/**",
+        "src/lib/prisma/**",
+        "src/shadcn/**",
     ]
 }
