@@ -51,6 +51,9 @@
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
+  --navbar-background: oklch(0.38 0.13 25);
+  --navbar-foreground: oklch(0.97 0.01 25);
+  --navbar-border: oklch(0.29 0.1 25);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -86,6 +89,9 @@
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
+  --navbar-background: oklch(0.34 0.11 25);
+  --navbar-foreground: oklch(0.97 0.01 25);
+  --navbar-border: oklch(0.24 0.08 25);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
@@ -126,5 +132,22 @@
   }
   html {
     @apply font-sans;
+  }
+
+  .navbar {
+    background-color: var(--navbar-background);
+    color: var(--navbar-foreground);
+    border-bottom: 1px solid var(--navbar-border);
+  }
+
+  .navbar a,
+  .navbar button,
+  .navbar svg,
+  .navbar [data-slot="button"] {
+    color: inherit;
+  }
+
+  .navbar [data-slot="button"]:hover {
+    color: inherit;
   }
 }

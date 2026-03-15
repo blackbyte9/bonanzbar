@@ -2,7 +2,14 @@
   "files.associations": {
     "src/app/globals.css": "tailwindcss"
   },
-  "cSpell.words": ["Bonanzbar"],
+  "[tailwindcss]": {
+    "css.lint.unknownAtRules": "ignore"
+  },
+  "cSpell.words": [
+    "Bonanzbar",
+    "datatable",
+    "userlist"
+],
   "cSpell.ignorePaths": [
     ".gitignore",
     "tsconfig.json",
@@ -15,6 +22,6 @@
     "src/prisma/**",
     "src/lib/prisma/**",
     "src/shadcn/**",
-    "src/app/globals.css",
+    "src/app/globals.css"
   ]
 }
