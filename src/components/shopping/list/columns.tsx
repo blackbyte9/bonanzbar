@@ -31,16 +31,16 @@ export function getColumnsForShoppingList({
         },
         {
             accessorKey: "count",
-            header: "Count",
+            header: "Anzahl",
         },
         {
             accessorKey: "unit",
-            header: "Unit",
+            header: "Einheit",
             cell: ({ row }) => row.original.unit ?? "-",
         },
         {
             accessorKey: "userName",
-            header: "Added By",
+            header: "Hinzugefügt von",
             cell: ({ row }) => row.original.userName ?? "-",
         },
     ];
@@ -66,7 +66,7 @@ export function getColumnsForShoppingList({
                         onClick={() => onMarkDone(itemId)}
                         disabled={isLoading}
                     >
-                        {isLoading ? "Saving..." : "Done"}
+                        {isLoading ? "Speichern..." : "Erledigt"}
                     </Button>
                 );
             },

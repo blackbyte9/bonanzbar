@@ -20,7 +20,7 @@ export async function updateUserRole(userId: string, role: UserRole): Promise<vo
     });
 
     if (!response.ok) {
-        throw new Error("Failed to update role.");
+        throw new Error("Fehler beim Aktualisieren der Rolle.");
     }
 }
 
@@ -60,7 +60,7 @@ export default async function executeRoleChangeAction<TUser extends AdminUser>({
                     : user,
             ),
         );
-        setError("Could not update user role.");
+        setError("Fehler beim Aktualisieren der Rolle.");
     } finally {
         setUpdatingUserIds((prev) => ({
             ...prev,

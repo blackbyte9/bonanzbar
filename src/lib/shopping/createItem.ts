@@ -16,13 +16,13 @@ export async function createShoppingListItem(input: CreateShoppingListItemInput)
     });
 
     if (!response.ok) {
-        throw new Error("Failed to add shopping item.");
+        throw new Error("Fehler beim Hinzufügen des Einkaufsartikels.");
     }
 
     const payload = (await response.json()) as { item?: ShoppingListItem };
 
     if (!payload.item) {
-        throw new Error("Missing shopping item in response.");
+        throw new Error("Fehler beim Abrufen des Einkaufsartikels aus der Antwort.");
     }
 
     return payload.item;

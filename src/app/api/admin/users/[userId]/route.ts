@@ -29,18 +29,18 @@ export async function DELETE(_request: Request, context: RouteContext) {
     });
 
     if (!targetUser) {
-        return NextResponse.json({ error: "User not found." }, { status: 404 });
+        return NextResponse.json({ error: "Benutzer nicht gefunden." }, { status: 404 });
     }
 
     if (actorRole === UserRole.ADMIN && targetUser.role === UserRole.ADMIN) {
         return NextResponse.json(
-            { error: "Admins cannot delete another admin." },
+            { error: "Admins können keinen anderen Admin löschen." },
             { status: 403 },
         );
     }
 
     if (authResult.userId === userId) {
-        return NextResponse.json({ error: "You cannot delete your own account." }, { status: 400 });
+        return NextResponse.json({ error: "Sie können Ihr eigenes Konto nicht löschen." }, { status: 400 });
     }
 
     await prisma.user.delete({

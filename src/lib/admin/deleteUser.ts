@@ -36,7 +36,7 @@ async function deleteUser(userId: string): Promise<void> {
     });
 
     if (!response.ok) {
-        throw new Error("Failed to delete user.");
+        throw new Error("Fehler beim Löschen des Benutzers.");
     }
 }
 
@@ -74,7 +74,7 @@ export default async function executeDeleteUserAction<TUser extends AdminUser>({
             const userToRestore = deletedUser;
             setUsers((prev) => restoreUserToList(prev, userToRestore));
         }
-        setError("Could not delete user.");
+        setError("Fehler beim Löschen des Benutzers.");
     } finally {
         setDeletingUserIds((prev) => ({
             ...prev,

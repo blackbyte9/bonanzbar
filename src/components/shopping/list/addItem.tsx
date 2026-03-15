@@ -44,14 +44,14 @@ export async function executeAddItemAction({
     const parsedCount = Number(count);
 
     if (!trimmedName) {
-        toast.error("Please enter an item name.");
-        setError("Please enter an item name.");
+        toast.error("Bitte geben Sie einen Artikelnamen ein.");
+        setError("Bitte geben Sie einen Artikelnamen ein.");
         return;
     }
 
     if (!Number.isFinite(parsedCount) || parsedCount < 0 || !Number.isInteger(parsedCount)) {
-        toast.error("Count must be a whole number equal to or greater than 0.");
-        setError("Count must be a whole number equal to or greater than 0.");
+        toast.error("Die Anzahl muss eine ganze Zahl größer oder gleich 0 sein.");
+        setError("Die Anzahl muss eine ganze Zahl größer oder gleich 0 sein.");
         return;
     }
 
@@ -69,10 +69,10 @@ export async function executeAddItemAction({
         setName("");
         setCount("1");
         setUnit("");
-        toast.success("Item added to shopping list.");
+        toast.success("Artikel zur Einkaufsliste hinzugefügt.");
     } catch {
-        toast.error("Could not add shopping item.");
-        setError("Could not add shopping item.");
+        toast.error("Konnte den Einkaufsartikel nicht hinzufügen.");
+        setError("Konnte den Einkaufsartikel nicht hinzufügen.");
     } finally {
         setIsAdding(false);
     }
@@ -113,7 +113,7 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
                     id="shopping-item-name"
                     type="text"
                     className="h-9 rounded-md border px-3 text-sm"
-                    placeholder="e.g. Milk"
+                    placeholder="z.B. Rum"
                     value={name}
                     onChange={(event) => setName(event.target.value)}
                     disabled={isAdding}
@@ -122,7 +122,7 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
             </div>
 
             <div className="flex flex-col gap-1">
-                <label htmlFor="shopping-item-count" className="text-sm font-medium">Count</label>
+                <label htmlFor="shopping-item-count" className="text-sm font-medium">Anzahl</label>
                 <input
                     id="shopping-item-count"
                     type="number"
@@ -137,12 +137,12 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
             </div>
 
             <div className="flex flex-col gap-1">
-                <label htmlFor="shopping-item-unit" className="text-sm font-medium">Unit</label>
+                <label htmlFor="shopping-item-unit" className="text-sm font-medium">Einheit</label>
                 <input
                     id="shopping-item-unit"
                     type="text"
                     className="h-9 rounded-md border px-3 text-sm"
-                    placeholder="e.g. pcs"
+                    placeholder="z.B. Stück"
                     value={unit}
                     onChange={(event) => setUnit(event.target.value)}
                     disabled={isAdding}
@@ -150,7 +150,7 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
             </div>
 
             <Button type="submit" disabled={isAdding}>
-                {isAdding ? "Adding..." : "Add Item"}
+                {isAdding ? "Hinzufügen..." : "Artikel hinzufügen"}
             </Button>
         </form>
     );

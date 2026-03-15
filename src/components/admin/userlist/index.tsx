@@ -65,7 +65,7 @@ export default function UserList() {
                 }
             } catch {
                 if (isMounted) {
-                    setError("Could not load users.");
+                    setError("Konnte Benutzer nicht laden.");
                 }
             } finally {
                 if (isMounted) {
@@ -83,12 +83,12 @@ export default function UserList() {
 
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">User List</h1>
+            <h1 className="text-2xl font-bold mb-4">Benutzerliste</h1>
 
             {error ? (
                 <p className="text-sm text-red-500">{error}</p>
             ) : isLoading ? (
-                <p className="text-sm text-muted-foreground">Loading users...</p>
+                <p className="text-sm text-muted-foreground">Benutzer werden geladen...</p>
             ) : (
                 <GenericDataTable columns={columns} data={users} />
             )}

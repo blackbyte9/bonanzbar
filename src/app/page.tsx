@@ -1,4 +1,3 @@
-import { Button } from "@/shadcn/components/ui/button";
 
 export default function Home() {
   return (
@@ -12,9 +11,6 @@ export default function Home() {
           <p className="max-w-md text-lg leading-8">
             Hier kommt die Verwaltungsapp der Bonanzbar.
           </p>
-          <Button className="mt-10" variant="outline">
-            Click me
-          </Button>
         </div>
 
       </main>

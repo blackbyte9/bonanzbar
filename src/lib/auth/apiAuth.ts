@@ -27,7 +27,7 @@ export async function requireApiAuth(allowedRoles?: readonly UserRole[]): Promis
 
     if (!session?.user) {
         return {
-            response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
+            response: NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 }),
         };
     }
 
@@ -35,7 +35,7 @@ export async function requireApiAuth(allowedRoles?: readonly UserRole[]): Promis
 
     if (allowedRoles && (!userRole || !allowedRoles.includes(userRole))) {
         return {
-            response: NextResponse.json({ error: "Forbidden" }, { status: 403 }),
+            response: NextResponse.json({ error: "Verboten" }, { status: 403 }),
         };
     }
 

@@ -24,7 +24,6 @@ export default function AdminPage() {
 
     return (
         <main className="p-4">
-            <h1>Admin Area</h1>
             <UserList />
         </main>
     );

@@ -17,7 +17,7 @@ export default async function loadUsers(): Promise<AdminUser[]> {
     });
 
     if (!response.ok) {
-        throw new Error("Failed to load users.");
+        throw new Error("Fehler beim Laden der Benutzer.");
     }
 
     const payload = (await response.json()) as { users?: AdminUser[] };

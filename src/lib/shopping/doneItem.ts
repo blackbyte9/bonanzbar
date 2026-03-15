@@ -4,6 +4,6 @@ export async function markShoppingListItemDone(itemId: number): Promise<void> {
     });
 
     if (!response.ok) {
-        throw new Error("Failed to mark shopping item as done.");
+        throw new Error("Fehler beim Markieren des Einkaufsartikels als erledigt.");
     }
 }

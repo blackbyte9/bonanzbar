@@ -60,14 +60,14 @@ export default function ShoppingList() {
             try {
                 setError(null);
                 await markShoppingListItemDone(itemId);
-                toast.success("Item marked as done.");
+                toast.success("Erfolgreich auf erledigt gesetzt.");
             } catch {
                 if (removedItem) {
                     const itemToRestore = removedItem;
                     setShoppingItems((prev) => [itemToRestore, ...prev]);
                 }
-                setError("Could not mark shopping item as done.");
-                toast.error("Could not mark shopping item as done.");
+                setError("Konnte den Einkaufsartikel nicht auf erledigt setzen.");
+                toast.error("Konnte den Einkaufsartikel nicht auf erledigt setzen.");
             } finally {
                 setMarkingDoneIds((prev) => ({
                     ...prev,
@@ -116,7 +116,7 @@ export default function ShoppingList() {
                 }
             } catch {
                 if (isMounted) {
-                    setError("Could not load shopping items.");
+                    setError("Konnte die Einkaufsartikel nicht laden.");
                 }
             } finally {
                 if (isMounted && showLoadingState) {
@@ -139,16 +139,16 @@ export default function ShoppingList() {
 
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">Shopping Items</h1>
+            <h1 className="text-2xl font-bold mb-4">Einkaufsartikel</h1>
 
             {canAddItems ? <AddShoppingItemForm setErrorAction={setError} setShoppingItemsAction={setShoppingItems} /> : null}
 
             {error ? (
                 <p className="text-sm text-red-500">{error}</p>
             ) : isLoading ? (
-                <p className="text-sm text-muted-foreground">Loading shopping items...</p>
+                <p className="text-sm text-muted-foreground">Lade Einkaufsartikel...</p>
             ) : (
-                <GenericDataTable columns={columns} data={shoppingItems} emptyMessage="No shopping items found." />
+                <GenericDataTable columns={columns} data={shoppingItems} emptyMessage="Keine Einkaufsartikel gefunden." />
             )}
         </div>
     );

@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     const parsedPayload = parseCreateShoppingItemPayload(payload);
 
     if (!parsedPayload) {
-        return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+        return NextResponse.json({ error: "Ungültige Eingabe" }, { status: 400 });
     }
 
     const item = await prisma.shoppingList.create({

@@ -42,7 +42,7 @@ export function getColumns({ onRoleChangeAction, onDeleteUserAction, updatingUse
         },
         {
             accessorKey: "role",
-            header: "Role",
+            header: "Rolle",
             cell: ({ row }) => {
                 const userId = row.original.id;
                 const role = row.original.role ?? UserRole.INACTIVE;
@@ -57,7 +57,7 @@ export function getColumns({ onRoleChangeAction, onDeleteUserAction, updatingUse
                         }}
                         disabled={isUpdating}
                         className="w-40"
-                        aria-label={`Role for ${row.original.email}`}
+                        aria-label={`Rolle für ${row.original.email}`}
                     >
                         {ROLE_OPTIONS.map((roleOption) => (
                             <NativeSelectOption key={roleOption} value={roleOption}>
@@ -70,7 +70,7 @@ export function getColumns({ onRoleChangeAction, onDeleteUserAction, updatingUse
         },
         {
             accessorKey: "id",
-            header: "Actions",
+            header: "Aktionen",
             cell: ({ row }) => {
                 const userId = row.original.id;
                 const isProtectedAdminTarget = currentUserRole === UserRole.ADMIN && row.original.role === UserRole.ADMIN;
@@ -86,7 +86,7 @@ export function getColumns({ onRoleChangeAction, onDeleteUserAction, updatingUse
                             void onDeleteUserAction(userId);
                         }}
                     >
-                        {deletingUserIds[userId] ? "Deleting..." : "Delete"}
+                        {deletingUserIds[userId] ? "Löschen..." : "Löschen"}
                     </Button>
                 );
             },

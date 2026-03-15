@@ -23,9 +23,9 @@ export default function GuestPage() {
 
 	return (
 		<main className="p-4">
-			<h1>Guest Area</h1>
-			<p>Welcome to the guest area! This page is accessible to all users, including guests.</p>
-			<p>User name: {username}</p>
+			<h1>Gäste Bereich</h1>
+			<p>Willkommen im Gäste Bereich! Diese Seite ist für alle Benutzer zugänglich, einschließlich Gäste.</p>
+			<p>Benutzername: {username}</p>
 		</main>
 	);
 };

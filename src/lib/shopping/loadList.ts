@@ -20,7 +20,7 @@ export async function loadShoppingList(): Promise<ShoppingListItem[]> {
     });
 
     if (!response.ok) {
-        throw new Error("Failed to load shopping list.");
+        throw new Error("Fehler beim Laden der Einkaufsliste.");
     }
 
     const payload = (await response.json()) as { shoppingList?: ShoppingListItem[] };

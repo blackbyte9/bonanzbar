@@ -37,12 +37,12 @@ export async function PATCH(request: Request, context: RouteContext) {
     });
 
     if (!targetUser) {
-        return NextResponse.json({ error: "User not found." }, { status: 404 });
+        return NextResponse.json({ error: "Benutzer nicht gefunden." }, { status: 404 });
     }
 
     if (actorRole === UserRole.ADMIN && targetUser.role === UserRole.ADMIN) {
         return NextResponse.json(
-            { error: "Admins cannot change another admin's role." },
+            { error: "Admins können die Rolle eines anderen Admins nicht ändern." },
             { status: 403 },
         );
     }
@@ -50,7 +50,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     const body = (await request.json()) as { role?: string };
 
     if (!body.role || !TARGET_ROLES.has(body.role as UserRole)) {
-        return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+        return NextResponse.json({ error: "Ungültige Rolle" }, { status: 400 });
     }
 
     const updatedUser = await prisma.user.update({

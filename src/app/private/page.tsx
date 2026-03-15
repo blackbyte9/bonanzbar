@@ -1,42 +1,25 @@
-import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
-import prisma from "@/lib/prisma";
-import { UserRole } from "@/prisma/enums";
-import { NextResponse } from "next/server";
+"use client";
 
-const ALLOWED_ROLES = [UserRole.ADMIN, UserRole.ORGANIZER, UserRole.USER] as const;
+import usePrivatePageAuth from "@/lib/auth/usePrivatePageAuth";
+import { Loader2 } from "lucide-react";
 
-type RouteContext = {
-    params: Promise<{ itemId: string }>;
-};
+const ALLOWED_ROLES = ["ADMIN", "ORGANIZER", "USER"] as const;
 
-export async function PATCH(_request: Request, context: RouteContext) {
-    const authResult = await requireApiAuth(ALLOWED_ROLES);
+export default function PrivatePage() {
+	const { isSessionLoading, isAuthorized } =
+		usePrivatePageAuth(ALLOWED_ROLES);
 
-    if (isApiAuthFailure(authResult)) {
-        return authResult.response;
-    }
+	if (isSessionLoading) {
+		return (
+			<div className="flex justify-center items-center h-screen">
+				<Loader2 className="h-8 w-8 animate-spin" />
+			</div>
+		);
+	}
 
-    const { itemId } = await context.params;
-    const parsedItemId = Number(itemId);
+	if (!isAuthorized) {
+		return null;
+	}
 
-    if (!Number.isInteger(parsedItemId) || parsedItemId <= 0) {
-        return NextResponse.json({ error: "Invalid shopping item id" }, { status: 400 });
-    }
-
-    const updateResult = await prisma.shoppingList.updateMany({
-        where: {
-            id: parsedItemId,
-            done: false,
-        },
-        data: {
-            done: true,
-            doneAt: new Date(),
-        },
-    });
-
-    if (updateResult.count === 0) {
-        return NextResponse.json({ error: "Shopping item not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({ success: true });
+	return <main className="p-4">Private Area</main>;
 }
