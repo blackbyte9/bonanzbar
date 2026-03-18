@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -11,6 +10,7 @@ import { useSession } from "@/lib/auth/client";
 import { toast } from "sonner";
 
 const SHOPPING_LIST_POLL_INTERVAL_MS = 60_000;
+const SMALL_DISPLAY_MEDIA_QUERY = "(max-width: 640px)";
 
 function createShoppingListSignature(items: ShoppingColumns[]): string {
     return JSON.stringify(
@@ -30,6 +30,7 @@ export default function ShoppingList() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [markingDoneIds, setMarkingDoneIds] = useState<Record<number, boolean>>({});
+    const [isSmallDisplay, setIsSmallDisplay] = useState(false);
     const latestSignatureRef = useRef("");
     const canAddItems = !isSessionLoading && session?.user?.role !== "GUEST";
     const canMarkDone = !isSessionLoading && session?.user?.role !== "GUEST";
@@ -78,17 +79,44 @@ export default function ShoppingList() {
         [canMarkDone, markingDoneIds],
     );
 
-    const columns = useMemo(
-        () =>
-            getColumnsForShoppingList({
-                canMarkDone,
-                isDoneLoadingAction: isDoneLoading,
-                onMarkDoneAction: (itemId) => {
-                    void handleMarkDone(itemId);
-                },
-            }),
-        [canMarkDone, handleMarkDone, isDoneLoading],
-    );
+    const columns = useMemo(() => {
+        const allColumns = getColumnsForShoppingList({
+            canMarkDone,
+            isDoneLoadingAction: isDoneLoading,
+            onMarkDoneAction: (itemId) => {
+                void handleMarkDone(itemId);
+            },
+        });
+
+        if (!isSmallDisplay) {
+            return allColumns;
+        }
+
+        return allColumns.filter((column) => {
+            if ("accessorKey" in column && column.accessorKey === "userName") {
+                return false;
+            }
+            if ("id" in column && column.id === "userName") {
+                return false;
+            }
+            return true;
+        });
+    }, [canMarkDone, handleMarkDone, isDoneLoading, isSmallDisplay]);
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia(SMALL_DISPLAY_MEDIA_QUERY);
+
+        const handleChange = () => {
+            setIsSmallDisplay(mediaQuery.matches);
+        };
+
+        handleChange();
+        mediaQuery.addEventListener("change", handleChange);
+
+        return () => {
+            mediaQuery.removeEventListener("change", handleChange);
+        };
+    }, []);
 
     useEffect(() => {
         latestSignatureRef.current = createShoppingListSignature(shoppingItems);

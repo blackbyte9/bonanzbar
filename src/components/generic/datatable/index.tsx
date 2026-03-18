@@ -35,8 +35,8 @@ export default function GenericDataTable<TData, TValue>({
     });
 
     return (
-        <div className="overflow-hidden rounded-md border">
-            <Table>
+        <div className="w-full overflow-x-auto rounded-md border">
+            <Table className="w-full table-fixed">
                 <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
@@ -63,7 +63,7 @@ export default function GenericDataTable<TData, TValue>({
                                 data-state={row.getIsSelected() && "selected"}
                             >
                                 {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id}>
+                                    <TableCell key={cell.id} className="truncate">
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </TableCell>
                                 ))}
