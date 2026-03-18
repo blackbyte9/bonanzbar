@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { CellContext, ColumnDef } from "@tanstack/react-table";
 import GenericDataTable from "@/components/generic/datatable";
 import { getColumnsForShoppingList, ShoppingColumns } from "./columns";
 import { loadShoppingList } from "@/lib/shopping/loadList";
@@ -92,15 +93,33 @@ export default function ShoppingList() {
             return allColumns;
         }
 
-        return allColumns.filter((column) => {
-            if ("accessorKey" in column && column.accessorKey === "userName") {
-                return false;
-            }
-            if ("id" in column && column.id === "userName") {
-                return false;
-            }
-            return true;
-        });
+        return allColumns
+            .filter((column) => {
+                if ("accessorKey" in column && column.accessorKey === "userName") {
+                    return false;
+                }
+                if ("id" in column && column.id === "userName") {
+                    return false;
+                }
+                return true;
+            })
+            .map((column): ColumnDef<ShoppingColumns> => {
+                const accessorKey = "accessorKey" in column ? column.accessorKey : undefined;
+                const columnId = "id" in column ? column.id : undefined;
+
+                if (accessorKey === "name" || columnId === "name") {
+                    return {
+                        ...column,
+                        cell: (info: CellContext<ShoppingColumns, unknown>) => (
+                            <span className="block w-full whitespace-normal wrap-break-word leading-snug">
+                                {info.row.original.name}
+                            </span>
+                        ),
+                    };
+                }
+
+                return column;
+            });
     }, [canMarkDone, handleMarkDone, isDoneLoading, isSmallDisplay]);
 
     useEffect(() => {
