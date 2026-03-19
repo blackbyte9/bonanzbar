@@ -185,17 +185,23 @@ export default function ShoppingList() {
     }, []);
 
     return (
-        <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">Einkaufsartikel</h1>
+        <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen py-4 sm:static sm:left-auto sm:right-auto sm:mx-0 sm:w-full sm:px-4">
+            <h1 className="mb-4 px-4 text-2xl font-bold sm:px-0">Einkaufsartikel</h1>
 
-            {canAddItems ? <AddShoppingItemForm setErrorAction={setError} setShoppingItemsAction={setShoppingItems} /> : null}
+            {canAddItems ? (
+                <div className="w-full px-4 sm:px-0">
+                    <AddShoppingItemForm setErrorAction={setError} setShoppingItemsAction={setShoppingItems} />
+                </div>
+            ) : null}
 
             {error ? (
-                <p className="text-sm text-red-500">{error}</p>
+                <p className="px-4 text-sm text-red-500 sm:px-0">{error}</p>
             ) : isLoading ? (
-                <p className="text-sm text-muted-foreground">Lade Einkaufsartikel...</p>
+                <p className="px-4 text-sm text-muted-foreground sm:px-0">Lade Einkaufsartikel...</p>
             ) : (
-                <GenericDataTable columns={columns} data={shoppingItems} emptyMessage="Keine Einkaufsartikel gefunden." />
+                <div className="w-full px-4 sm:px-0">
+                    <GenericDataTable columns={columns} data={shoppingItems} emptyMessage="Keine Einkaufsartikel gefunden." />
+                </div>
             )}
         </div>
     );
