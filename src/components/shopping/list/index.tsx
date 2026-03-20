@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CellContext, ColumnDef } from "@tanstack/react-table";
 import GenericDataTable from "@/components/generic/datatable";
+import { useTableDataLoader } from "@/components/generic/datatable/useTableDataLoader";
 import { getColumnsForShoppingList, ShoppingColumns } from "./columns";
 import { loadShoppingList } from "@/lib/shopping/loadList";
 import { markShoppingListItemDone } from "@/lib/shopping/doneItem";
@@ -28,8 +29,7 @@ function createShoppingListSignature(items: ShoppingColumns[]): string {
 export default function ShoppingList() {
     const { data: session, isPending: isSessionLoading } = useSession();
     const [shoppingItems, setShoppingItems] = useState<ShoppingColumns[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const { isLoading, error, setError, runWithTableLoading } = useTableDataLoader();
     const [markingDoneIds, setMarkingDoneIds] = useState<Record<number, boolean>>({});
     const [isSmallDisplay, setIsSmallDisplay] = useState(false);
     const latestSignatureRef = useRef("");
@@ -77,7 +77,7 @@ export default function ShoppingList() {
                 }));
             }
         },
-        [canMarkDone, markingDoneIds],
+        [canMarkDone, markingDoneIds, setError],
     );
 
     const columns = useMemo(() => {
@@ -142,32 +142,20 @@ export default function ShoppingList() {
     }, [shoppingItems]);
 
     useEffect(() => {
-        let isMounted = true;
-
         async function fetchShoppingList(showLoadingState: boolean) {
-            try {
-                if (showLoadingState) {
-                    setIsLoading(true);
-                }
-                setError(null);
+            const list = await runWithTableLoading({
+                loader: loadShoppingList,
+                errorMessage: "Konnte die Einkaufsartikel nicht laden.",
+                showLoading: showLoadingState,
+            });
 
-                const list = await loadShoppingList();
+            if (list) {
                 const mappedList = list.map(mapToShoppingColumns);
                 const nextSignature = createShoppingListSignature(mappedList);
 
-                if (isMounted) {
-                    if (nextSignature !== latestSignatureRef.current) {
-                        latestSignatureRef.current = nextSignature;
-                        setShoppingItems(mappedList);
-                    }
-                }
-            } catch {
-                if (isMounted) {
-                    setError("Konnte die Einkaufsartikel nicht laden.");
-                }
-            } finally {
-                if (isMounted && showLoadingState) {
-                    setIsLoading(false);
+                if (nextSignature !== latestSignatureRef.current) {
+                    latestSignatureRef.current = nextSignature;
+                    setShoppingItems(mappedList);
                 }
             }
         }
@@ -179,10 +167,9 @@ export default function ShoppingList() {
         }, SHOPPING_LIST_POLL_INTERVAL_MS);
 
         return () => {
-            isMounted = false;
             window.clearInterval(intervalId);
         };
-    }, []);
+    }, [runWithTableLoading]);
 
     return (
         <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen py-4 sm:static sm:left-auto sm:right-auto sm:mx-0 sm:w-full sm:px-4">
@@ -194,15 +181,18 @@ export default function ShoppingList() {
                 </div>
             ) : null}
 
-            {error ? (
-                <p className="px-4 text-sm text-red-500 sm:px-0">{error}</p>
-            ) : isLoading ? (
-                <p className="px-4 text-sm text-muted-foreground sm:px-0">Lade Einkaufsartikel...</p>
-            ) : (
-                <div className="w-full px-4 sm:px-0">
-                    <GenericDataTable columns={columns} data={shoppingItems} emptyMessage="Keine Einkaufsartikel gefunden." />
-                </div>
-            )}
+            <div className="w-full px-4 sm:px-0">
+                <GenericDataTable
+                    columns={columns}
+                    data={shoppingItems}
+                    emptyMessage="Keine Einkaufsartikel gefunden."
+                    isLoading={isLoading}
+                    error={error}
+                    loadingMessage="Lade Einkaufsartikel..."
+                    loadingVariant="skeleton"
+                    skeletonRowCount={6}
+                />
+            </div>
         </div>
     );
 }

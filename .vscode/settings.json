@@ -23,5 +23,7 @@
     "src/lib/prisma/**",
     "src/shadcn/**",
     "src/app/globals.css"
-  ]
+  ],
+  "WillLuke.nextjs.addTypesOnSave": true,
+  "WillLuke.nextjs.hasPrompted": true
 }

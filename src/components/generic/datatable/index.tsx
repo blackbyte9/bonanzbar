@@ -20,12 +20,22 @@ interface GenericDataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
     emptyMessage?: string;
+    isLoading?: boolean;
+    error?: string | null;
+    loadingMessage?: string;
+    loadingVariant?: "text" | "skeleton";
+    skeletonRowCount?: number;
 }
 
 export default function GenericDataTable<TData, TValue>({
     columns,
     data,
     emptyMessage = "No results.",
+    isLoading = false,
+    error = null,
+    loadingMessage = "Loading...",
+    loadingVariant = "text",
+    skeletonRowCount = 5,
 }: GenericDataTableProps<TData, TValue>) {
     // eslint-disable-next-line react-hooks/incompatible-library
     const table = useReactTable({
@@ -56,7 +66,17 @@ export default function GenericDataTable<TData, TValue>({
                     ))}
                 </TableHeader>
                 <TableBody>
-                    {table.getRowModel().rows?.length ? (
+                    {isLoading && !error && loadingVariant === "skeleton" ? (
+                        Array.from({ length: skeletonRowCount }).map((_, rowIndex) => (
+                            <TableRow key={`skeleton-row-${rowIndex}`}>
+                                {columns.map((_, columnIndex) => (
+                                    <TableCell key={`skeleton-cell-${rowIndex}-${columnIndex}`}>
+                                        <div className="h-4 w-full animate-pulse rounded bg-muted" />
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        ))
+                    ) : !isLoading && !error && table.getRowModel().rows?.length ? (
                         table.getRowModel().rows.map((row) => (
                             <TableRow
                                 key={row.id}
@@ -71,8 +91,11 @@ export default function GenericDataTable<TData, TValue>({
                         ))
                     ) : (
                         <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                {emptyMessage}
+                            <TableCell
+                                colSpan={columns.length}
+                                className={error ? "h-24 text-center text-sm text-red-500" : "h-24 text-center text-sm text-muted-foreground"}
+                            >
+                                {error ?? (isLoading ? loadingMessage : emptyMessage)}
                             </TableCell>
                         </TableRow>
                     )}

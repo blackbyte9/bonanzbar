@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getColumns, UserColumns } from "./columns";
 import GenericDataTable from "@/components/generic/datatable";
+import { useTableDataLoader } from "@/components/generic/datatable/useTableDataLoader";
 import { UserRole } from "@/prisma/enums";
 import { useSession } from "@/lib/auth/client";
 import loadUsers from "@/lib/admin/loadUsers";
@@ -13,9 +14,7 @@ export default function UserList() {
     const { data: session } = useSession();
     const [users, setUsers] = useState<UserColumns[]>([]);
     const currentUserRole = (session?.user?.role as UserRole | null | undefined) ?? null;
-
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const { isLoading, error, setError, runWithTableLoading } = useTableDataLoader();
     const [updatingUserIds, setUpdatingUserIds] = useState<Record<string, boolean>>({});
     const [deletingUserIds, setDeletingUserIds] = useState<Record<string, boolean>>({});
 
@@ -51,47 +50,34 @@ export default function UserList() {
     );
 
     useEffect(() => {
-        let isMounted = true;
-
         async function fetchUsers() {
-            try {
-                setIsLoading(true);
-                setError(null);
+            const loadedUsers = await runWithTableLoading({
+                loader: loadUsers,
+                errorMessage: "Konnte Benutzer nicht laden.",
+            });
 
-                const users = await loadUsers();
-
-                if (isMounted) {
-                    setUsers(users);
-                }
-            } catch {
-                if (isMounted) {
-                    setError("Konnte Benutzer nicht laden.");
-                }
-            } finally {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
+            if (loadedUsers) {
+                setUsers(loadedUsers);
             }
         }
 
         void fetchUsers();
 
-        return () => {
-            isMounted = false;
-        };
-    }, []);
+    }, [runWithTableLoading]);
 
     return (
         <div className="p-4">
             <h1 className="text-2xl font-bold mb-4">Benutzerliste</h1>
 
-            {error ? (
-                <p className="text-sm text-red-500">{error}</p>
-            ) : isLoading ? (
-                <p className="text-sm text-muted-foreground">Benutzer werden geladen...</p>
-            ) : (
-                <GenericDataTable columns={columns} data={users} />
-            )}
+            <GenericDataTable
+                columns={columns}
+                data={users}
+                isLoading={isLoading}
+                error={error}
+                loadingMessage="Benutzer werden geladen..."
+                loadingVariant="skeleton"
+                skeletonRowCount={6}
+            />
         </div>
     );
 };
