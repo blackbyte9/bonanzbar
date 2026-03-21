@@ -2,12 +2,13 @@
 
 import { ShoppingListItem } from "@/lib/shopping/loadList";
 import { createShoppingListItem } from "@/lib/shopping/createItem";
+import { loadShoppingItems, ShoppingItemPreset } from "@/lib/shopping/loadItems";
 import { loadShoppingUnits } from "@/lib/shopping/loadUnit";
 import { Button } from "@/shadcn/components/ui/button";
-import { useCallback, useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
+import { useCallback, useEffect, useMemo, useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import { toast } from "sonner";
 import type { ShoppingColumns } from "./columns";
-import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "@/shadcn/components/ui/combobox";
+import ComboboxField from "@/components/generic/form/comboboxField";
 
 function mapToShoppingColumns(item: ShoppingListItem): ShoppingColumns {
     return {
@@ -92,8 +93,50 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
     const [name, setName] = useState("");
     const [count, setCount] = useState("1");
     const [unit, setUnit] = useState("");
+    const [presetItems, setPresetItems] = useState<ShoppingItemPreset[]>([]);
+    const [isPresetLoading, setIsPresetLoading] = useState(false);
     const [units, setUnits] = useState<string[]>([]);
     const [isUnitLoading, setIsUnitLoading] = useState(false);
+
+    const presetItemNames = useMemo(
+        () => presetItems.map((item) => item.name),
+        [presetItems],
+    );
+
+    const selectedPreset = useMemo(() => {
+        const normalizedName = name.trim().toLocaleLowerCase();
+
+        if (!normalizedName) {
+            return null;
+        }
+
+        return presetItems.find((item) => item.name.trim().toLocaleLowerCase() === normalizedName) ?? null;
+    }, [name, presetItems]);
+
+    useEffect(() => {
+        if (!selectedPreset) {
+            return;
+        }
+
+        setCount(String(selectedPreset.count));
+        setUnit(selectedPreset.unit ?? "");
+    }, [selectedPreset]);
+
+    const loadPresetItems = useCallback(async () => {
+        if (isPresetLoading) {
+            return;
+        }
+
+        try {
+            setIsPresetLoading(true);
+            const loadedPresetItems = await loadShoppingItems();
+            setPresetItems(loadedPresetItems);
+        } catch {
+            toast.error("Konnte die Artikelvorlagen nicht laden.");
+        } finally {
+            setIsPresetLoading(false);
+        }
+    }, [isPresetLoading]);
 
     const loadUnits = useCallback(async () => {
         if (isUnitLoading) {
@@ -127,25 +170,31 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
         });
 
         if (wasAdded) {
-            await loadUnits();
+            await Promise.all([
+                loadUnits(),
+                loadPresetItems(),
+            ]);
         }
     }
 
     return (
         <form onSubmit={handleAddItem} className="mb-4 flex flex-col gap-2 md:flex-row md:items-end">
-            <div className="flex flex-col gap-1">
-                <label htmlFor="shopping-item-name" className="text-sm font-medium">Name</label>
-                <input
-                    id="shopping-item-name"
-                    type="text"
-                    className="h-9 rounded-md border px-3 text-sm"
-                    placeholder="z.B. Rum"
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                    disabled={isAdding}
-                    required
-                />
-            </div>
+            <ComboboxField
+                id="shopping-item-name"
+                label="Name"
+                placeholder="z.B. Rum"
+                items={presetItemNames}
+                value={name}
+                onValueChangeAction={setName}
+                onFocusAction={() => {
+                    if (presetItems.length === 0) {
+                        void loadPresetItems();
+                    }
+                }}
+                emptyMessage="Keine Artikelvorlagen gefunden."
+                disabled={isAdding}
+                required
+            />
 
             <div className="flex flex-col gap-1">
                 <label htmlFor="shopping-item-count" className="text-sm font-medium">Anzahl</label>
@@ -162,33 +211,21 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
                 />
             </div>
 
-            <div className="flex flex-col gap-1">
-                <label htmlFor="shopping-item-unit" className="text-sm font-medium">Einheit</label>
-                <Combobox items={units}>
-                    <ComboboxInput
-                        placeholder="z.B. Stück"
-                        value={unit}
-                        onChange={(event) => setUnit(event.target.value)}
-                        onFocus={() => {
-                            if (units.length === 0) {
-                                void loadUnits();
-                            }
-                        }}
-                        disabled={isAdding}
-                        className="h-9 rounded-md border px-3 text-sm"
-                    />
-                    <ComboboxContent>
-                        <ComboboxEmpty className="p-2 text-sm text-muted-foreground">Keine Einheiten gefunden.</ComboboxEmpty>
-                        <ComboboxList>
-                            {(item) => (
-                                <ComboboxItem key={item} value={item}>
-                                    {item}
-                                </ComboboxItem>
-                            )}
-                        </ComboboxList>
-                    </ComboboxContent>
-                </Combobox>
-            </div>
+            <ComboboxField
+                id="shopping-item-unit"
+                label="Einheit"
+                placeholder="z.B. Stück"
+                items={units}
+                value={unit}
+                onValueChangeAction={setUnit}
+                onFocusAction={() => {
+                    if (units.length === 0) {
+                        void loadUnits();
+                    }
+                }}
+                emptyMessage="Keine Einheiten gefunden."
+                disabled={isAdding}
+            />
 
             <Button type="submit" disabled={isAdding}>
                 {isAdding ? "Hinzufügen..." : "Artikel hinzufügen"}

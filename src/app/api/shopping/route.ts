@@ -64,6 +64,42 @@ async function ensureShoppingUnitExists(unit: string | null): Promise<void> {
     }
 }
 
+async function saveShoppingItemPreset(name: string, count: number, unit: string | null): Promise<void> {
+    const existingPreset = await prisma.shoppingItems.findFirst({
+        where: {
+            name: {
+                equals: name,
+                mode: "insensitive",
+            },
+        },
+        select: {
+            id: true,
+        },
+    });
+
+    if (existingPreset) {
+        await prisma.shoppingItems.update({
+            where: {
+                id: existingPreset.id,
+            },
+            data: {
+                name,
+                count,
+                unit,
+            },
+        });
+        return;
+    }
+
+    await prisma.shoppingItems.create({
+        data: {
+            name,
+            count,
+            unit,
+        },
+    });
+}
+
 export async function GET() {
     const authResult = await requireApiAuth(ALLOWED_GET_ROLES);
 
@@ -120,7 +156,10 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Ungültige Eingabe" }, { status: 400 });
     }
 
-    await ensureShoppingUnitExists(parsedPayload.unit);
+    await Promise.all([
+        ensureShoppingUnitExists(parsedPayload.unit),
+        saveShoppingItemPreset(parsedPayload.name, parsedPayload.count, parsedPayload.unit),
+    ]);
 
     const item = await prisma.shoppingList.create({
         data: {
