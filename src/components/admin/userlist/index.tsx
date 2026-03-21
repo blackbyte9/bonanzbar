@@ -26,7 +26,7 @@ export default function UserList() {
             setUpdatingUserIds,
             setError,
         });
-    }, []);
+    }, [setError]);
 
     const handleDeleteUser = useCallback(async (userId: string) => {
         await executeDeleteUserAction<UserColumns>({
@@ -35,7 +35,7 @@ export default function UserList() {
             setDeletingUserIds,
             setError,
         });
-    }, []);
+    }, [setError]);
 
     const columns = useMemo(
         () =>

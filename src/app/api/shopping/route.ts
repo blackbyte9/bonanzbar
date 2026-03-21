@@ -41,6 +41,29 @@ function parseCreateShoppingItemPayload(payload: CreateShoppingItemPayload): {
     };
 }
 
+async function ensureShoppingUnitExists(unit: string | null): Promise<void> {
+    if (!unit) {
+        return;
+    }
+
+    const existingUnit = await prisma.shoppingUnits.findFirst({
+        where: {
+            name: unit,
+        },
+        select: {
+            id: true,
+        },
+    });
+
+    if (!existingUnit) {
+        await prisma.shoppingUnits.create({
+            data: {
+                name: unit,
+            },
+        });
+    }
+}
+
 export async function GET() {
     const authResult = await requireApiAuth(ALLOWED_GET_ROLES);
 
@@ -96,6 +119,8 @@ export async function POST(request: Request) {
     if (!parsedPayload) {
         return NextResponse.json({ error: "Ungültige Eingabe" }, { status: 400 });
     }
+
+    await ensureShoppingUnitExists(parsedPayload.unit);
 
     const item = await prisma.shoppingList.create({
         data: {

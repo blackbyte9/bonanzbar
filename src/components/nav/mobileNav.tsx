@@ -16,14 +16,14 @@ export default function MobileNav({ navItems }: MobileNavProps) {
 
     return (
         <>
-            <div className="pointer-events-none absolute top-1/2 left-1/2 mt-1.25 -translate-x-1/2 -translate-y-1/2 md:hidden">
-                <Image
+            <div className="absolute top-1/2 left-1/2 mt-1.25 -translate-x-1/2 -translate-y-1/2 md:hidden pointer-events-auto">
+                <Link href="/"><Image
                     src="/logo.png"
                     alt="Bonanzbar Logo"
                     width={480}
                     height={88}
                     className="h-10 w-auto"
-                />
+                /></Link>
             </div>
 
             <Sheet open={open} onOpenChange={setOpen}>

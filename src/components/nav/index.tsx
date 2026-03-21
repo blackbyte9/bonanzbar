@@ -7,11 +7,9 @@ import { headers } from "next/headers";
 import { UserButton } from "@daveyplate/better-auth-ui";
 
 const unknownNavItems: NavItem[] = [
-    { label: "Home", href: "/" },
 ];
 
 const guestNavItems: NavItem[] = [
-    { label: "Home", href: "/" },
     { label: "Einkaufsliste", href: "/shopping" },
 ];
 

@@ -2,10 +2,12 @@
 
 import { ShoppingListItem } from "@/lib/shopping/loadList";
 import { createShoppingListItem } from "@/lib/shopping/createItem";
+import { loadShoppingUnits } from "@/lib/shopping/loadUnit";
 import { Button } from "@/shadcn/components/ui/button";
-import { useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
+import { useCallback, useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import { toast } from "sonner";
 import type { ShoppingColumns } from "./columns";
+import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "@/shadcn/components/ui/combobox";
 
 function mapToShoppingColumns(item: ShoppingListItem): ShoppingColumns {
     return {
@@ -39,20 +41,20 @@ export async function executeAddItemAction({
     setNameAction: setName,
     setCountAction: setCount,
     setUnitAction: setUnit,
-}: ExecuteAddItemActionParams): Promise<void> {
+}: ExecuteAddItemActionParams): Promise<boolean> {
     const trimmedName = name.trim();
     const parsedCount = Number(count);
 
     if (!trimmedName) {
         toast.error("Bitte geben Sie einen Artikelnamen ein.");
         setError("Bitte geben Sie einen Artikelnamen ein.");
-        return;
+        return false;
     }
 
     if (!Number.isFinite(parsedCount) || parsedCount < 0 || !Number.isInteger(parsedCount)) {
         toast.error("Die Anzahl muss eine ganze Zahl größer oder gleich 0 sein.");
         setError("Die Anzahl muss eine ganze Zahl größer oder gleich 0 sein.");
-        return;
+        return false;
     }
 
     try {
@@ -70,9 +72,11 @@ export async function executeAddItemAction({
         setCount("1");
         setUnit("");
         toast.success("Artikel zur Einkaufsliste hinzugefügt.");
+        return true;
     } catch {
         toast.error("Konnte den Einkaufsartikel nicht hinzufügen.");
         setError("Konnte den Einkaufsartikel nicht hinzufügen.");
+        return false;
     } finally {
         setIsAdding(false);
     }
@@ -88,11 +92,29 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
     const [name, setName] = useState("");
     const [count, setCount] = useState("1");
     const [unit, setUnit] = useState("");
+    const [units, setUnits] = useState<string[]>([]);
+    const [isUnitLoading, setIsUnitLoading] = useState(false);
+
+    const loadUnits = useCallback(async () => {
+        if (isUnitLoading) {
+            return;
+        }
+
+        try {
+            setIsUnitLoading(true);
+            const loadedUnits = await loadShoppingUnits();
+            setUnits(loadedUnits);
+        } catch {
+            toast.error("Konnte die Einheiten nicht laden.");
+        } finally {
+            setIsUnitLoading(false);
+        }
+    }, [isUnitLoading]);
 
     async function handleAddItem(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        await executeAddItemAction({
+        const wasAdded = await executeAddItemAction({
             name,
             count,
             unit,
@@ -103,6 +125,10 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
             setCountAction: setCount,
             setUnitAction: setUnit,
         });
+
+        if (wasAdded) {
+            await loadUnits();
+        }
     }
 
     return (
@@ -138,15 +164,30 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
 
             <div className="flex flex-col gap-1">
                 <label htmlFor="shopping-item-unit" className="text-sm font-medium">Einheit</label>
-                <input
-                    id="shopping-item-unit"
-                    type="text"
-                    className="h-9 rounded-md border px-3 text-sm"
-                    placeholder="z.B. Stück"
-                    value={unit}
-                    onChange={(event) => setUnit(event.target.value)}
-                    disabled={isAdding}
-                />
+                <Combobox items={units}>
+                    <ComboboxInput
+                        placeholder="z.B. Stück"
+                        value={unit}
+                        onChange={(event) => setUnit(event.target.value)}
+                        onFocus={() => {
+                            if (units.length === 0) {
+                                void loadUnits();
+                            }
+                        }}
+                        disabled={isAdding}
+                        className="h-9 rounded-md border px-3 text-sm"
+                    />
+                    <ComboboxContent>
+                        <ComboboxEmpty className="p-2 text-sm text-muted-foreground">Keine Einheiten gefunden.</ComboboxEmpty>
+                        <ComboboxList>
+                            {(item) => (
+                                <ComboboxItem key={item} value={item}>
+                                    {item}
+                                </ComboboxItem>
+                            )}
+                        </ComboboxList>
+                    </ComboboxContent>
+                </Combobox>
             </div>
 
             <Button type="submit" disabled={isAdding}>
