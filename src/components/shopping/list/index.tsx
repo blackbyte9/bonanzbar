@@ -10,6 +10,7 @@ import { markShoppingListItemDone } from "@/lib/shopping/doneItem";
 import { AddShoppingItemForm, mapToShoppingColumns } from "./addItem";
 import { useSession } from "@/lib/auth/client";
 import { toast } from "sonner";
+import TablePageShell from "@/components/generic/datatable/tablePageShell";
 
 const SHOPPING_LIST_POLL_INTERVAL_MS = 60_000;
 const SMALL_DISPLAY_MEDIA_QUERY = "(max-width: 640px)";
@@ -172,27 +173,21 @@ export default function ShoppingList() {
     }, [runWithTableLoading]);
 
     return (
-        <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen py-4 sm:static sm:left-auto sm:right-auto sm:mx-0 sm:w-full sm:px-4">
-            <h1 className="mb-4 px-4 text-2xl font-bold sm:px-0">Einkaufsartikel</h1>
-
+        <TablePageShell title="Einkaufsartikel">
             {canAddItems ? (
-                <div className="w-full px-4 sm:px-0">
-                    <AddShoppingItemForm setErrorAction={setError} setShoppingItemsAction={setShoppingItems} />
-                </div>
+                <AddShoppingItemForm setErrorAction={setError} setShoppingItemsAction={setShoppingItems} />
             ) : null}
 
-            <div className="w-full px-4 sm:px-0">
-                <GenericDataTable
-                    columns={columns}
-                    data={shoppingItems}
-                    emptyMessage="Keine Einkaufsartikel gefunden."
-                    isLoading={isLoading}
-                    error={error}
-                    loadingMessage="Lade Einkaufsartikel..."
-                    loadingVariant="skeleton"
-                    skeletonRowCount={6}
-                />
-            </div>
-        </div>
+            <GenericDataTable
+                columns={columns}
+                data={shoppingItems}
+                emptyMessage="Keine Einkaufsartikel gefunden."
+                isLoading={isLoading}
+                error={error}
+                loadingMessage="Lade Einkaufsartikel..."
+                loadingVariant="skeleton"
+                skeletonRowCount={6}
+            />
+        </TablePageShell>
     );
 }

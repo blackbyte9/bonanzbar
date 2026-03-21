@@ -23,7 +23,7 @@ export default function ShoppingPage() {
     }
 
     return (
-        <main className="p-4">
+        <main className="w-full">
             <ShoppingList />
         </main>
     );

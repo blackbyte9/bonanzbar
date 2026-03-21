@@ -9,6 +9,7 @@ import { useSession } from "@/lib/auth/client";
 import loadUsers from "@/lib/admin/loadUsers";
 import executeDeleteUserAction from "@/lib/admin/deleteUser";
 import executeRoleChangeAction from "@/lib/admin/changeUserRole";
+import TablePageShell from "@/components/generic/datatable/tablePageShell";
 
 export default function UserList() {
     const { data: session } = useSession();
@@ -66,9 +67,7 @@ export default function UserList() {
     }, [runWithTableLoading]);
 
     return (
-        <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">Benutzerliste</h1>
-
+        <TablePageShell title="Benutzerliste">
             <GenericDataTable
                 columns={columns}
                 data={users}
@@ -78,6 +77,6 @@ export default function UserList() {
                 loadingVariant="skeleton"
                 skeletonRowCount={6}
             />
-        </div>
+        </TablePageShell>
     );
 };
