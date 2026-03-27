@@ -2,10 +2,12 @@
 
 import {
     ColumnDef,
+    Row,
     flexRender,
     getCoreRowModel,
     useReactTable,
 } from "@tanstack/react-table";
+import type { MouseEvent } from "react";
 
 import {
     Table,
@@ -25,6 +27,7 @@ interface GenericDataTableProps<TData, TValue> {
     loadingMessage?: string;
     loadingVariant?: "text" | "skeleton";
     skeletonRowCount?: number;
+    rowClickHandler?: (row: Row<TData>, event: MouseEvent<HTMLTableRowElement>) => void;
 }
 
 export default function GenericDataTable<TData, TValue>({
@@ -36,6 +39,7 @@ export default function GenericDataTable<TData, TValue>({
     loadingMessage = "Loading...",
     loadingVariant = "text",
     skeletonRowCount = 5,
+    rowClickHandler,
 }: GenericDataTableProps<TData, TValue>) {
     // eslint-disable-next-line react-hooks/incompatible-library
     const table = useReactTable({
@@ -81,6 +85,8 @@ export default function GenericDataTable<TData, TValue>({
                             <TableRow
                                 key={row.id}
                                 data-state={row.getIsSelected() && "selected"}
+                                className={rowClickHandler ? "cursor-pointer" : undefined}
+                                onClick={rowClickHandler ? (event) => rowClickHandler(row, event) : undefined}
                             >
                                 {row.getVisibleCells().map((cell) => (
                                     <TableCell key={cell.id} className="truncate">

@@ -63,7 +63,10 @@ export function getColumnsForShoppingList({
                         type="button"
                         size="sm"
                         variant="secondary"
-                        onClick={() => onMarkDone(itemId)}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            onMarkDone(itemId);
+                        }}
                         disabled={isLoading}
                     >
                         {isLoading ? "Speichern..." : "Erledigt"}
