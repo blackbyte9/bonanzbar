@@ -11,6 +11,7 @@ const unknownNavItems: NavItem[] = [
 
 const guestNavItems: NavItem[] = [
     { label: "Einkaufsliste", href: "/shopping" },
+    { label: "Inventur", href: "/inventory" },
 ];
 
 const userNavItems: NavItem[] = [

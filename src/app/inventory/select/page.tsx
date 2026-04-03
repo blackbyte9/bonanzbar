@@ -1,0 +1,30 @@
+"use client";
+
+import usePrivatePageAuth from "@/lib/auth/usePrivatePageAuth";
+import { Loader2 } from "lucide-react";
+import InventorySelectList from "@/components/inventory/select";
+
+const ALLOWED_ROLES = ["ADMIN", "ORGANIZER", "USER", "GUEST"] as const;
+
+export default function InventorySelectPage() {
+    const { isSessionLoading, isAuthorized } =
+        usePrivatePageAuth(ALLOWED_ROLES);
+
+    if (isSessionLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+        );
+    }
+
+    if (!isAuthorized) {
+        return null;
+    }
+
+    return (
+        <main className="w-full">
+            <InventorySelectList />
+        </main>
+    );
+}

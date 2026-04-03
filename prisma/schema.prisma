@@ -41,6 +41,7 @@ model User {
 
   @@unique([email])
   @@map("user")
+  inventoryDates InventoryDates[]
 }
 
 model Session {
@@ -126,4 +127,25 @@ model ShoppingItems {
   name  String
   count Int     @default(0)
   unit  String?
+
+  @@map("shoppingitems")
+}
+
+// ######### inventory models #########
+model InventoryDates {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  startDate      String
+  endDate        String?
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId String?
+
+  previousInventoryId        Int?
+  previousInventory          InventoryDates? @relation("InventoryHierarchy", fields: [previousInventoryId], references: [id], onDelete: SetNull)
+  followingInventories       InventoryDates[] @relation("InventoryHierarchy")
+
+  @@map("inventorydates")
 }

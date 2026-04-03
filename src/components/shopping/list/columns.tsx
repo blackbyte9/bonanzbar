@@ -1,6 +1,6 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
+import type { CellContext, ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/shadcn/components/ui/button";
 
 // This type is used to define the shape of our data.
@@ -17,6 +17,10 @@ type ShoppingColumnsOptions = {
     canMarkDone: boolean;
     isDoneLoadingAction: (id: number) => boolean;
     onMarkDoneAction: (id: number) => void;
+};
+
+type ShoppingDisplayColumnsOptions = ShoppingColumnsOptions & {
+    isSmallDisplay: boolean;
 };
 
 export function getColumnsForShoppingList({
@@ -75,4 +79,49 @@ export function getColumnsForShoppingList({
             },
         },
     ];
-};
+}
+
+export function getDisplayColumnsForShoppingList({
+    canMarkDone,
+    isDoneLoadingAction,
+    onMarkDoneAction,
+    isSmallDisplay,
+}: ShoppingDisplayColumnsOptions): ColumnDef<ShoppingColumns>[] {
+    const allColumns = getColumnsForShoppingList({
+        canMarkDone,
+        isDoneLoadingAction,
+        onMarkDoneAction,
+    });
+
+    if (!isSmallDisplay) {
+        return allColumns;
+    }
+
+    return allColumns
+        .filter((column) => {
+            if ("accessorKey" in column && column.accessorKey === "userName") {
+                return false;
+            }
+            if ("id" in column && column.id === "userName") {
+                return false;
+            }
+            return true;
+        })
+        .map((column): ColumnDef<ShoppingColumns> => {
+            const accessorKey = "accessorKey" in column ? column.accessorKey : undefined;
+            const columnId = "id" in column ? column.id : undefined;
+
+            if (accessorKey === "name" || columnId === "name") {
+                return {
+                    ...column,
+                    cell: (info: CellContext<ShoppingColumns, unknown>) => (
+                        <span className="block w-full whitespace-normal wrap-break-word leading-snug">
+                            {info.row.original.name}
+                        </span>
+                    ),
+                };
+            }
+
+            return column;
+        });
+}

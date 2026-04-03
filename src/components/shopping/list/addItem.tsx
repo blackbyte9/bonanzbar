@@ -2,13 +2,12 @@
 
 import { ShoppingListItem } from "@/lib/shopping/loadList";
 import { createShoppingListItem } from "@/lib/shopping/createItem";
-import { loadShoppingItems, ShoppingItemPreset } from "@/lib/shopping/loadItems";
-import { loadShoppingUnits } from "@/lib/shopping/loadUnit";
 import { Button } from "@/shadcn/components/ui/button";
-import { useCallback, useEffect, useMemo, useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
+import { useEffect, useMemo, useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import { toast } from "sonner";
 import type { ShoppingColumns } from "./columns";
 import ComboboxField from "@/components/generic/form/comboboxField";
+import { useShoppingItemMetadata } from "./useShoppingItemMetadata";
 
 function mapToShoppingColumns(item: ShoppingListItem): ShoppingColumns {
     return {
@@ -93,15 +92,13 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
     const [name, setName] = useState("");
     const [count, setCount] = useState("1");
     const [unit, setUnit] = useState("");
-    const [presetItems, setPresetItems] = useState<ShoppingItemPreset[]>([]);
-    const [isPresetLoading, setIsPresetLoading] = useState(false);
-    const [units, setUnits] = useState<string[]>([]);
-    const [isUnitLoading, setIsUnitLoading] = useState(false);
-
-    const presetItemNames = useMemo(
-        () => presetItems.map((item) => item.name),
-        [presetItems],
-    );
+    const {
+        presetItems,
+        presetItemNames,
+        units,
+        loadPresetItems,
+        loadUnits,
+    } = useShoppingItemMetadata();
 
     const selectedPreset = useMemo(() => {
         const normalizedName = name.trim().toLocaleLowerCase();
@@ -118,41 +115,11 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
             return;
         }
 
-        setCount(String(selectedPreset.count));
-        setUnit(selectedPreset.unit ?? "");
+        setTimeout(() => {
+            setCount(String(selectedPreset.count));
+            setUnit(selectedPreset.unit ?? "");
+        }, 0);
     }, [selectedPreset]);
-
-    const loadPresetItems = useCallback(async () => {
-        if (isPresetLoading) {
-            return;
-        }
-
-        try {
-            setIsPresetLoading(true);
-            const loadedPresetItems = await loadShoppingItems();
-            setPresetItems(loadedPresetItems);
-        } catch {
-            toast.error("Konnte die Artikelvorlagen nicht laden.");
-        } finally {
-            setIsPresetLoading(false);
-        }
-    }, [isPresetLoading]);
-
-    const loadUnits = useCallback(async () => {
-        if (isUnitLoading) {
-            return;
-        }
-
-        try {
-            setIsUnitLoading(true);
-            const loadedUnits = await loadShoppingUnits();
-            setUnits(loadedUnits);
-        } catch {
-            toast.error("Konnte die Einheiten nicht laden.");
-        } finally {
-            setIsUnitLoading(false);
-        }
-    }, [isUnitLoading]);
 
     async function handleAddItem(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
