@@ -1,5 +1,5 @@
 import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
-import prisma from "@/lib/prisma";
+import { readInventoryListDb } from "@/lib/inventory/server/read";
 import { UserRole } from "@/prisma/enums";
 import { NextResponse } from "next/server";
 
@@ -12,20 +12,7 @@ export async function GET() {
         return authResult.response;
     }
 
-    const inventories = await prisma.inventoryDates.findMany({
-        where: {
-            userId: authResult.userId,
-        },
-        select: {
-            id: true,
-            startDate: true,
-            endDate: true,
-            createdAt: true,
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
+    const inventories = await readInventoryListDb(authResult.userId);
 
     return NextResponse.json({
         inventories: inventories.map((inventory) => ({

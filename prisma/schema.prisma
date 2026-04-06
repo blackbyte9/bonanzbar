@@ -96,14 +96,18 @@ model ShoppingList {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name   String
   count  Int       @default(0)
-  unit   String?
   done   Boolean   @default(false)
   doneAt DateTime?
 
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId String?
+
+  item  Item?  @relation(fields: [itemId], references: [id], onDelete: SetNull)
+  itemId Int?
+
+  unit ShoppingUnits? @relation(fields: [shoppingUnitId], references: [id], onDelete: SetNull)
+  shoppingUnitId Int?
 
   @@map("shoppinglist")
 }
@@ -118,6 +122,7 @@ model ShoppingUnits {
   items     Item[]
 
   @@map("shoppingunits")
+  shoppingLists ShoppingList[]
 }
 
 // ######### inventory models #########
@@ -168,8 +173,10 @@ model Item {
   packageSize     Int?            @default(1)
   isInventoryItem Boolean         @default(false)
   inventoryItems  InventoryItem[]
+  
   shoppingUnitId  Int?
   shoppingUnit    ShoppingUnits?  @relation(fields: [shoppingUnitId], references: [id], onDelete: SetNull)
 
   @@map("item")
+  shoppingLists ShoppingList[]
 }

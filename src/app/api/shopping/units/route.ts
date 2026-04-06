@@ -1,5 +1,5 @@
 import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
-import prisma from "@/lib/prisma";
+import { readShoppingUnitsDb } from "@/lib/shopping/server/read";
 import { UserRole } from "@/prisma/enums";
 import { NextResponse } from "next/server";
 
@@ -12,14 +12,7 @@ export async function GET() {
         return authResult.response;
     }
 
-    const units = await prisma.shoppingUnits.findMany({
-        select: {
-            name: true,
-        },
-        orderBy: {
-            name: "asc",
-        },
-    });
+    const units = await readShoppingUnitsDb();
 
     return NextResponse.json({
         units: units.map((unit) => unit.name),

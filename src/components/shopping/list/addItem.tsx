@@ -1,7 +1,7 @@
 "use client";
 
-import { ShoppingListItem } from "@/lib/shopping/loadList";
-import { createShoppingListItem } from "@/lib/shopping/createItem";
+import { createShoppingListItem } from "@/lib/shopping/create";
+import { ShoppingListItem } from "@/lib/shopping/read";
 import { Button } from "@/shadcn/components/ui/button";
 import { useEffect, useMemo, useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import { toast } from "sonner";

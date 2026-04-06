@@ -1,6 +1,6 @@
-import { AdminUser } from "@/lib/admin/loadUsers";
-import { UserRole } from "@/prisma/enums";
 import type { Dispatch, SetStateAction } from "react";
+import type { AdminUser } from "@/lib/admin/read";
+import { UserRole } from "@/prisma/enums";
 
 type RoleChangeActionParams<TUser extends AdminUser> = {
     userId: string;
@@ -67,4 +67,4 @@ export default async function executeRoleChangeAction<TUser extends AdminUser>({
             [userId]: false,
         }));
     }
-};
+}

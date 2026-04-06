@@ -1,7 +1,7 @@
 "use client";
 
-import { createInventory } from "@/lib/inventory/createInventory";
-import { InventoryListItem } from "@/lib/inventory/loadList";
+import { createInventory } from "@/lib/inventory/create";
+import { InventoryListItem } from "@/lib/inventory/read";
 import { Button } from "@/shadcn/components/ui/button";
 import { Input } from "@/shadcn/components/ui/input";
 import { useCallback, useState, type Dispatch, type FormEvent, type SetStateAction } from "react";

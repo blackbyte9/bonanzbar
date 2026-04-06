@@ -2,7 +2,7 @@
 
 import { usePollingTableData } from "@/components/generic/datatable/usePollingTableData";
 import { createListSignature } from "@/lib/collections/createListSignature";
-import { loadInventoryItems, type InventoryItemListItem } from "@/lib/inventory/loadItems";
+import { loadInventoryItems, type InventoryItemListItem } from "@/lib/inventory/read";
 import { useCallback } from "react";
 import type { InventoryListColumns } from "./columns";
 

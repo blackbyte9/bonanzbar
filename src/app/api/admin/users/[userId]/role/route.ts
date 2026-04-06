@@ -1,6 +1,7 @@
 
 import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
-import prisma from "@/lib/prisma";
+import { readUserRoleDb } from "@/lib/admin/server/read";
+import { updateUserRoleDb } from "@/lib/admin/server/update";
 import { UserRole } from "@/prisma/enums";
 import { NextResponse } from "next/server";
 
@@ -28,13 +29,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     const { userId } = await context.params;
 
-    const targetUser = await prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-            id: true,
-            role: true,
-        },
-    });
+    const targetUser = await readUserRoleDb(userId);
 
     if (!targetUser) {
         return NextResponse.json({ error: "Benutzer nicht gefunden." }, { status: 404 });
@@ -53,16 +48,7 @@ export async function PATCH(request: Request, context: RouteContext) {
         return NextResponse.json({ error: "Ungültige Rolle" }, { status: 400 });
     }
 
-    const updatedUser = await prisma.user.update({
-        where: { id: userId },
-        data: {
-            role: body.role as UserRole,
-        },
-        select: {
-            id: true,
-            role: true,
-        },
-    });
+    const updatedUser = await updateUserRoleDb(userId, body.role as UserRole);
 
     return NextResponse.json({
         user: updatedUser,

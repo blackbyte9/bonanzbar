@@ -1,7 +1,6 @@
 
 import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
-
-import prisma from "@/lib/prisma";
+import { readUsersDb } from "@/lib/admin/server/read";
 import { UserRole } from "@/prisma/enums";
 import { NextResponse } from "next/server";
 
@@ -14,17 +13,7 @@ export async function GET() {
         return authResult.response;
     }
 
-    const users = await prisma.user.findMany({
-        select: {
-            id: true,
-            name: true,
-            email: true,
-            role: true,
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
+    const users = await readUsersDb();
 
     return NextResponse.json({
         users: users.map((user) => ({

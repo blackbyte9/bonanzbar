@@ -1,5 +1,6 @@
 import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
-import prisma from "@/lib/prisma";
+import { createShoppingListEntryDb } from "@/lib/shopping/server/create";
+import { readShoppingListDb } from "@/lib/shopping/server/read";
 import { UserRole } from "@/prisma/enums";
 import { NextResponse } from "next/server";
 
@@ -8,16 +9,42 @@ const ALLOWED_POST_ROLES = [UserRole.ADMIN, UserRole.ORGANIZER, UserRole.USER] a
 
 type CreateShoppingItemPayload = {
     name?: unknown;
+    itemName?: unknown;
+    item?: {
+        name?: unknown;
+    } | null;
     count?: unknown;
     unit?: unknown;
 };
+
+function resolvePayloadItemName(payload: CreateShoppingItemPayload): string {
+    const directName = typeof payload.name === "string" ? payload.name.trim() : "";
+
+    if (directName) {
+        return directName;
+    }
+
+    const explicitItemName = typeof payload.itemName === "string" ? payload.itemName.trim() : "";
+
+    if (explicitItemName) {
+        return explicitItemName;
+    }
+
+    const relationName = typeof payload.item?.name === "string" ? payload.item.name.trim() : "";
+
+    if (relationName) {
+        return relationName;
+    }
+
+    return "";
+}
 
 function parseCreateShoppingItemPayload(payload: CreateShoppingItemPayload): {
     name: string;
     count: number;
     unit: string | null;
 } | null {
-    const name = typeof payload.name === "string" ? payload.name.trim() : "";
+    const name = resolvePayloadItemName(payload);
     const parsedCount =
         typeof payload.count === "number"
             ? payload.count
@@ -41,78 +68,6 @@ function parseCreateShoppingItemPayload(payload: CreateShoppingItemPayload): {
     };
 }
 
-async function ensureShoppingUnitExists(unit: string | null): Promise<void> {
-    if (!unit) {
-        return;
-    }
-
-    const existingUnit = await prisma.shoppingUnits.findFirst({
-        where: {
-            name: unit,
-        },
-        select: {
-            id: true,
-        },
-    });
-
-    if (!existingUnit) {
-        await prisma.shoppingUnits.create({
-            data: {
-                name: unit,
-            },
-        });
-    }
-}
-
-async function upsertItemForShopping(name: string, unit: string | null): Promise<void> {
-    const existingItem = await prisma.item.findFirst({
-        where: {
-            name: {
-                equals: name,
-                mode: "insensitive",
-            },
-        },
-        select: {
-            id: true,
-            name: true,
-        },
-    });
-
-    const matchingUnit = unit
-        ? await prisma.shoppingUnits.findFirst({
-            where: {
-                name: unit,
-            },
-            select: {
-                id: true,
-            },
-        })
-        : null;
-
-    if (existingItem) {
-        await prisma.item.update({
-            where: {
-                id: existingItem.id,
-            },
-            data: {
-                name,
-                unit,
-                shoppingUnitId: matchingUnit?.id ?? null,
-            },
-        });
-        return;
-    }
-
-    await prisma.item.create({
-        data: {
-            name,
-            unit,
-            isInventoryItem: false,
-            shoppingUnitId: matchingUnit?.id ?? null,
-        },
-    });
-}
-
 export async function GET() {
     const authResult = await requireApiAuth(ALLOWED_GET_ROLES);
 
@@ -120,33 +75,15 @@ export async function GET() {
         return authResult.response;
     }
 
-    const shoppingList = await prisma.shoppingList.findMany({
-        select: {
-            id: true,
-            name: true,
-            count: true,
-            unit: true,
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                },
-            },
-        },
-        where: {
-            done: false,
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
+    const shoppingList = await readShoppingListDb();
 
     return NextResponse.json({
         shoppingList: shoppingList.map((item) => ({
             id: item.id,
-            name: item.name,
+            itemId: item.itemId,
+            name: item.item?.name ?? "",
             count: item.count,
-            unit: item.unit,
+            unit: item.unit?.name ?? null,
             user: {
                 id: item.user?.id,
                 name: item.user?.name,
@@ -169,37 +106,21 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Ungültige Eingabe" }, { status: 400 });
     }
 
-    await ensureShoppingUnitExists(parsedPayload.unit);
-    await upsertItemForShopping(parsedPayload.name, parsedPayload.unit);
-
-    const item = await prisma.shoppingList.create({
-        data: {
-            name: parsedPayload.name,
-            count: parsedPayload.count,
-            unit: parsedPayload.unit,
-            userId: authResult.userId,
-        },
-        select: {
-            id: true,
-            name: true,
-            count: true,
-            unit: true,
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                },
-            },
-        },
+    const item = await createShoppingListEntryDb({
+        userId: authResult.userId,
+        name: parsedPayload.name,
+        count: parsedPayload.count,
+        unit: parsedPayload.unit,
     });
 
     return NextResponse.json(
         {
             item: {
                 id: item.id,
-                name: item.name,
+                itemId: item.itemId,
+                name: item.item?.name ?? "",
                 count: item.count,
-                unit: item.unit,
+                unit: item.unit?.name ?? null,
                 user: {
                     id: item.user?.id,
                     name: item.user?.name,

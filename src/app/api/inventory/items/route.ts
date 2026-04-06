@@ -1,5 +1,5 @@
 import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
-import prisma from "@/lib/prisma";
+import { readInventoryItemsForSelectionDb } from "@/lib/inventory/server/read";
 import { UserRole } from "@/prisma/enums";
 import { NextResponse } from "next/server";
 
@@ -12,20 +12,7 @@ export async function GET() {
         return authResult.response;
     }
 
-    const items = await prisma.item.findMany({
-        where: {
-            isInventoryItem: true,
-        },
-        select: {
-            id: true,
-            name: true,
-            unit: true,
-            packageSize: true,
-        },
-        orderBy: {
-            name: "asc",
-        },
-    });
+    const items = await readInventoryItemsForSelectionDb();
 
     return NextResponse.json({
         items,

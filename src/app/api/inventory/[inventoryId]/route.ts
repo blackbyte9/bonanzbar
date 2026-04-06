@@ -1,5 +1,6 @@
 import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
-import prisma from "@/lib/prisma";
+import { readInventoryItemsDb } from "@/lib/inventory/server/read";
+import { upsertInventoryItemValuesDb } from "@/lib/inventory/server/update";
 import { UserRole } from "@/prisma/enums";
 import { NextResponse } from "next/server";
 
@@ -92,31 +93,7 @@ export async function GET(request: Request, context: RouteContext) {
         return NextResponse.json({ error: "Invalid inventory id" }, { status: 400 });
     }
 
-    const items = await prisma.item.findMany({
-        where: {
-            isInventoryItem: true,
-        },
-        select: {
-            id: true,
-            name: true,
-            unit: true,
-            packageSize: true,
-            inventoryItems: {
-                where: {
-                    inventoryDateId: parsedInventoryId,
-                },
-                select: {
-                    count: true,
-                    package: true,
-                    partial: true,
-                },
-                take: 1,
-            },
-        },
-        orderBy: {
-            name: "asc",
-        },
-    });
+    const items = await readInventoryItemsDb(parsedInventoryId);
 
     return NextResponse.json({
         items: items.map((item) => {
@@ -150,20 +127,6 @@ export async function PATCH(request: Request, context: RouteContext) {
         return NextResponse.json({ error: "Invalid inventory id" }, { status: 400 });
     }
 
-    const inventory = await prisma.inventoryDates.findFirst({
-        where: {
-            id: parsedInventoryId,
-            userId: authResult.userId,
-        },
-        select: {
-            id: true,
-        },
-    });
-
-    if (!inventory) {
-        return NextResponse.json({ error: "Inventory not found" }, { status: 404 });
-    }
-
     let payload: UpdateInventoryItemPayload;
 
     try {
@@ -178,62 +141,24 @@ export async function PATCH(request: Request, context: RouteContext) {
         return NextResponse.json({ error: "Ungültige Eingabe" }, { status: 400 });
     }
 
-    const item = await prisma.item.findFirst({
-        where: {
-            id: parsedPayload.itemId,
-            isInventoryItem: true,
-        },
-        select: {
-            id: true,
-        },
+    const updateResult = await upsertInventoryItemValuesDb({
+        inventoryId: parsedInventoryId,
+        userId: authResult.userId,
+        itemId: parsedPayload.itemId,
+        count: parsedPayload.count,
+        package: parsedPayload.package,
+        partial: parsedPayload.partial,
     });
 
-    if (!item) {
+    if (updateResult.kind === "inventory-not-found") {
+        return NextResponse.json({ error: "Inventory not found" }, { status: 404 });
+    }
+
+    if (updateResult.kind === "item-not-found") {
         return NextResponse.json({ error: "Item not found" }, { status: 404 });
     }
 
-    const existingInventoryItem = await prisma.inventoryItem.findFirst({
-        where: {
-            itemId: parsedPayload.itemId,
-            inventoryDateId: parsedInventoryId,
-        },
-        select: {
-            id: true,
-        },
-    });
-
-    const savedInventoryItem = existingInventoryItem
-        ? await prisma.inventoryItem.update({
-            where: {
-                id: existingInventoryItem.id,
-            },
-            data: {
-                count: parsedPayload.count,
-                package: parsedPayload.package,
-                partial: parsedPayload.partial,
-            },
-            select: {
-                itemId: true,
-                count: true,
-                package: true,
-                partial: true,
-            },
-        })
-        : await prisma.inventoryItem.create({
-            data: {
-                itemId: parsedPayload.itemId,
-                inventoryDateId: parsedInventoryId,
-                count: parsedPayload.count,
-                package: parsedPayload.package,
-                partial: parsedPayload.partial,
-            },
-            select: {
-                itemId: true,
-                count: true,
-                package: true,
-                partial: true,
-            },
-        });
+    const { savedInventoryItem } = updateResult;
 
     return NextResponse.json({
         item: {

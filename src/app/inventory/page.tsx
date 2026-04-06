@@ -1,7 +1,7 @@
 "use client";
 
 import usePrivatePageAuth from "@/lib/auth/usePrivatePageAuth";
-import { loadActiveInventory } from "@/lib/inventory/loadActiveInventory";
+import { loadActiveInventory } from "@/lib/inventory/read";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";

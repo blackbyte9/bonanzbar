@@ -6,9 +6,9 @@ import GenericDataTable from "@/components/generic/datatable";
 import { useTableDataLoader } from "@/components/generic/datatable/useTableDataLoader";
 import { UserRole } from "@/prisma/enums";
 import { useSession } from "@/lib/auth/client";
-import loadUsers from "@/lib/admin/loadUsers";
-import executeDeleteUserAction from "@/lib/admin/deleteUser";
-import executeRoleChangeAction from "@/lib/admin/changeUserRole";
+import executeDeleteUserAction from "@/lib/admin/delete";
+import loadUsers from "@/lib/admin/read";
+import executeRoleChangeAction from "@/lib/admin/update";
 import TablePageShell from "@/components/generic/datatable/tablePageShell";
 
 export default function UserList() {

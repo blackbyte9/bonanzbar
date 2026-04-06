@@ -1,5 +1,6 @@
 import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
-import prisma from "@/lib/prisma";
+import { deleteUserDb } from "@/lib/admin/server/delete";
+import { readUserRoleDb } from "@/lib/admin/server/read";
 import { UserRole } from "@/prisma/enums";
 import { NextResponse } from "next/server";
 
@@ -20,13 +21,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
 
     const { userId } = await context.params;
 
-    const targetUser = await prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-            id: true,
-            role: true,
-        },
-    });
+    const targetUser = await readUserRoleDb(userId);
 
     if (!targetUser) {
         return NextResponse.json({ error: "Benutzer nicht gefunden." }, { status: 404 });
@@ -43,9 +38,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
         return NextResponse.json({ error: "Sie können Ihr eigenes Konto nicht löschen." }, { status: 400 });
     }
 
-    await prisma.user.delete({
-        where: { id: userId },
-    });
+    await deleteUserDb(userId);
 
     return NextResponse.json({ success: true });
 }

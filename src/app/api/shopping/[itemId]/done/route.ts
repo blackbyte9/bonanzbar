@@ -1,5 +1,5 @@
 import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
-import prisma from "@/lib/prisma";
+import { markShoppingListEntryDoneDb } from "@/lib/shopping/server/update";
 import { UserRole } from "@/prisma/enums";
 import { NextResponse } from "next/server";
 
@@ -23,18 +23,9 @@ export async function PATCH(_request: Request, context: RouteContext) {
         return NextResponse.json({ error: "Invalid shopping item id" }, { status: 400 });
     }
 
-    const updateResult = await prisma.shoppingList.updateMany({
-        where: {
-            id: parsedItemId,
-            done: false,
-        },
-        data: {
-            done: true,
-            doneAt: new Date(),
-        },
-    });
+    const updatedCount = await markShoppingListEntryDoneDb(parsedItemId);
 
-    if (updateResult.count === 0) {
+    if (updatedCount === 0) {
         return NextResponse.json({ error: "Shopping item not found" }, { status: 404 });
     }
 

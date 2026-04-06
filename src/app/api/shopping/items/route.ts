@@ -1,5 +1,5 @@
 import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
-import prisma from "@/lib/prisma";
+import { readShoppingItemPresetsDb } from "@/lib/shopping/server/read";
 import { UserRole } from "@/prisma/enums";
 import { NextResponse } from "next/server";
 
@@ -12,39 +12,7 @@ export async function GET() {
         return authResult.response;
     }
 
-    const items = await prisma.item.findMany({
-        select: {
-            name: true,
-            shoppingUnit: {
-                select: {
-                    name: true,
-                },
-            },
-            updatedAt: true,
-        },
-        orderBy: {
-            updatedAt: "desc",
-        },
-    });
-
-    const uniqueItemsByName = new Map<string, { name: string; defaultUnit: string | null }>();
-
-    for (const item of items) {
-        const normalizedName = item.name.trim().toLocaleLowerCase();
-
-        if (!normalizedName || uniqueItemsByName.has(normalizedName)) {
-            continue;
-        }
-
-        uniqueItemsByName.set(normalizedName, {
-            name: item.name,
-            defaultUnit: item.shoppingUnit?.name ?? null,
-        });
-    }
-
-    const shoppingItems = Array.from(uniqueItemsByName.values()).sort((a, b) =>
-        a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
-    );
+    const shoppingItems = await readShoppingItemPresetsDb();
 
     return NextResponse.json({
         shoppingItems,

@@ -14,7 +14,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/shadcn/components/ui/sheet";
-import { updateInventoryItem } from "@/lib/inventory/updateItem";
+import { updateInventoryItem } from "@/lib/inventory/update";
 import type { InventoryListColumns } from "./columns";
 
 type UseInventoryListEditSheetParams = {

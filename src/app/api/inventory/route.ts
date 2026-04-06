@@ -1,5 +1,6 @@
 import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
-import prisma from "@/lib/prisma";
+import { createInventoryDb } from "@/lib/inventory/server/create";
+import { readActiveInventoryDb } from "@/lib/inventory/server/read";
 import { UserRole } from "@/prisma/enums";
 import { NextResponse } from "next/server";
 
@@ -31,17 +32,7 @@ export async function GET() {
         return authResult.response;
     }
 
-    const activeInventory = await prisma.inventoryDates.findFirst({
-        where: {
-            userId: authResult.userId,
-            endDate: null,
-        },
-        select: {
-            id: true,
-            startDate: true,
-            endDate: true,
-        },
-    });
+    const activeInventory = await readActiveInventoryDb(authResult.userId);
 
     return NextResponse.json({
         activeInventory,
@@ -70,18 +61,7 @@ export async function POST(request: Request) {
     }
 
     try {
-        const inventory = await prisma.inventoryDates.create({
-            data: {
-                startDate: parsed.startDate,
-                userId: authResult.userId,
-            },
-            select: {
-                id: true,
-                startDate: true,
-                endDate: true,
-                createdAt: true,
-            },
-        });
+        const inventory = await createInventoryDb(parsed.startDate, authResult.userId);
 
         return NextResponse.json({
             inventory,

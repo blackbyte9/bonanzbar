@@ -1,5 +1,5 @@
-import { AdminUser } from "@/lib/admin/loadUsers";
 import type { Dispatch, SetStateAction } from "react";
+import type { AdminUser } from "@/lib/admin/read";
 
 type DeleteUserActionParams<TUser extends AdminUser> = {
     userId: string;

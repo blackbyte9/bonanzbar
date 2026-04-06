@@ -1,3 +1,4 @@
+
 export type UpdateInventoryItemInput = {
     inventoryId: number;
     itemId: number;

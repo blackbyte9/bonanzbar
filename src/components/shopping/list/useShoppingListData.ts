@@ -1,7 +1,7 @@
 "use client";
 
 import { usePollingTableData } from "@/components/generic/datatable/usePollingTableData";
-import { loadShoppingList } from "@/lib/shopping/loadList";
+import { loadShoppingList } from "@/lib/shopping/read";
 import { createListSignature } from "@/lib/collections/createListSignature";
 import { mapToShoppingColumns } from "./addItem";
 import type { ShoppingColumns } from "./columns";

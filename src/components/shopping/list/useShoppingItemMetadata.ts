@@ -2,8 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { loadShoppingItems, type ShoppingItemPreset } from "@/lib/shopping/loadItems";
-import { loadShoppingUnits } from "@/lib/shopping/loadUnit";
+import { loadShoppingItems, loadShoppingUnits, type ShoppingItemPreset } from "@/lib/shopping/read";
 
 type UseShoppingItemMetadataResult = {
     presetItems: ShoppingItemPreset[];

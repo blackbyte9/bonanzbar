@@ -1,4 +1,4 @@
-import { InventoryListItem } from "@/lib/inventory/loadList";
+import type { InventoryListItem } from "@/lib/inventory/read";
 
 export type CreateInventoryInput = {
     startDate: string;

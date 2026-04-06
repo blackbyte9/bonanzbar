@@ -2,7 +2,7 @@
 
 import TablePageShell from "@/components/generic/datatable/tablePageShell";
 import InventoryList from "@/components/inventory/list";
-import { loadActiveInventory, type ActiveInventory } from "@/lib/inventory/loadActiveInventory";
+import { loadActiveInventory, type ActiveInventory } from "@/lib/inventory/read";
 import { Button } from "@/shadcn/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";

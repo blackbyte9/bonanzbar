@@ -2,7 +2,7 @@
 
 import { useCallback, type Dispatch, type SetStateAction } from "react";
 import { toast } from "sonner";
-import { markShoppingListItemDone } from "@/lib/shopping/doneItem";
+import { markShoppingListItemDone } from "@/lib/shopping/update";
 import { usePendingIds } from "@/lib/async/usePendingIds";
 import type { ShoppingColumns } from "./columns";
 
