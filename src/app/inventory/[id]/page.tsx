@@ -1,5 +1,6 @@
 "use client";
 
+import InventoryDetail from "@/components/inventory/detail";
 import usePrivatePageAuth from "@/lib/auth/usePrivatePageAuth";
 import { Loader2 } from "lucide-react";
 
@@ -21,9 +22,7 @@ export default function InventoryPage() {
         return null;
     }
 
-    return (
-        <main className="w-full">
-            Inventory List
-        </main>
-    );
+    return <main className="w-full">
+        <InventoryDetail />
+    </main>;
 };

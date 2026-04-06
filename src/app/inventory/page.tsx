@@ -23,6 +23,8 @@ export default function InventoryMainPage() {
 
                     if (!activeInventory) {
                         router.push("/inventory/select");
+                    } else {
+                        router.push(`/inventory/${activeInventory.id}`);
                     }
                 } catch {
                     toast.error("Konnte das aktive Inventar nicht laden.");

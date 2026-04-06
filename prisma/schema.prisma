@@ -37,11 +37,11 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  shoppingLists ShoppingList[]
+  shoppingLists  ShoppingList[]
+  inventoryDates InventoryDates[]
 
   @@unique([email])
   @@map("user")
-  inventoryDates InventoryDates[]
 }
 
 model Session {
@@ -137,15 +137,48 @@ model InventoryDates {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  startDate      String
-  endDate        String?
+  startDate String
+  endDate   String?
 
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId String?
 
-  previousInventoryId        Int?
-  previousInventory          InventoryDates? @relation("InventoryHierarchy", fields: [previousInventoryId], references: [id], onDelete: SetNull)
-  followingInventories       InventoryDates[] @relation("InventoryHierarchy")
+  previousInventoryId  Int?
+  previousInventory    InventoryDates?  @relation("InventoryHierarchy", fields: [previousInventoryId], references: [id], onDelete: SetNull)
+  followingInventories InventoryDates[] @relation("InventoryHierarchy")
+  inventoryItems       InventoryItem[]
 
   @@map("inventorydates")
+}
+
+model InventoryItem {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  count   Int    @default(0)
+  package Int    @default(0)
+  partial Float? @default(0)
+
+  Item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId Int
+
+  inventoryDateId Int
+  inventoryDate   InventoryDates @relation(fields: [inventoryDateId], references: [id], onDelete: Cascade)
+
+  @@map("inventoryitem")
+}
+
+model Item {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name            String
+  unit            String?
+  packageSize     Int?            @default(1)
+  isInventoryItem Boolean         @default(false)
+  inventoryItems  InventoryItem[]
+
+  @@map("item")
 }
