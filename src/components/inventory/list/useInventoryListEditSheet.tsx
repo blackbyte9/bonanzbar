@@ -161,6 +161,7 @@ export function useInventoryListEditSheet({
                         inventoryCount: savedItem.inventoryCount,
                         inventoryPackage: savedItem.inventoryPackage,
                         inventoryPartial: savedItem.inventoryPartial,
+                        inventorySum: savedItem.inventorySum,
                         hasNoInventoryItem: savedItem.hasNoInventoryItem,
                     }
                     : item

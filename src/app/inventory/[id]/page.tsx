@@ -45,7 +45,8 @@ export default function InventoryPage() {
         fetchInventory();
     }, [inventoryId]);
 
-    const isReadOnly = !isInventoryLoading && activeInventory?.endDate !== null;
+    const isInventoryClosed = !isInventoryLoading && activeInventory?.endDate !== null;
+    const isReadOnly = isInventoryClosed;
 
     if (isSessionLoading) {
         return (
@@ -62,7 +63,11 @@ export default function InventoryPage() {
     return (
         <main className="w-full">
             <InventoryDetail activeInventory={activeInventory} isInventoryLoading={isInventoryLoading} />
-            <InventoryList inventoryId={inventoryId} isReadOnly={isReadOnly} />
+            <InventoryList
+                inventoryId={inventoryId}
+                isReadOnly={isReadOnly}
+                isInventoryClosed={isInventoryClosed}
+            />
         </main>
     );
 };

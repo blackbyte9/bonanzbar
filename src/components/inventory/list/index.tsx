@@ -12,9 +12,14 @@ const SMALL_DISPLAY_MEDIA_QUERY = "(max-width: 640px)";
 type InventoryListProps = {
     inventoryId: number | null;
     isReadOnly?: boolean;
+    isInventoryClosed?: boolean;
 };
 
-export default function InventoryList({ inventoryId, isReadOnly = false }: InventoryListProps) {
+export default function InventoryList({
+    inventoryId,
+    isReadOnly = false,
+    isInventoryClosed = false,
+}: InventoryListProps) {
     const isSmallDisplay = useMediaQuery(SMALL_DISPLAY_MEDIA_QUERY);
     const {
         data: inventoryItems,
@@ -34,8 +39,9 @@ export default function InventoryList({ inventoryId, isReadOnly = false }: Inven
     const columns = useMemo(() => {
         return getDisplayColumnsForInventoryList({
             isSmallDisplay,
+            isInventoryClosed,
         });
-    }, [isSmallDisplay]);
+    }, [isInventoryClosed, isSmallDisplay]);
 
     return (
         <>

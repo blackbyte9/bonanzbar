@@ -10,11 +10,13 @@ export type InventoryListColumns = {
     inventoryCount: number | null;
     inventoryPackage: number | null;
     inventoryPartial: number | null;
+    inventorySum: number;
     hasNoInventoryItem: boolean;
 };
 
 type InventoryListDisplayColumnsOptions = {
     isSmallDisplay: boolean;
+    isInventoryClosed: boolean;
 };
 
 export function getColumnsForInventoryList(): ColumnDef<InventoryListColumns>[] {
@@ -48,11 +50,17 @@ export function getColumnsForInventoryList(): ColumnDef<InventoryListColumns>[] 
             header: "Teil",
             cell: ({ row }) => row.original.inventoryPartial ?? "-",
         },
+        {
+            accessorKey: "inventorySum",
+            header: "Summe",
+            cell: ({ row }) => row.original.inventorySum,
+        },
     ];
 }
 
 export function getDisplayColumnsForInventoryList({
     isSmallDisplay,
+    isInventoryClosed,
 }: InventoryListDisplayColumnsOptions): ColumnDef<InventoryListColumns>[] {
     const allColumns = getColumnsForInventoryList();
 
@@ -78,6 +86,12 @@ export function getDisplayColumnsForInventoryList({
                 return false;
             }
             if ("id" in column && column.id === "inventoryPartial") {
+                return false;
+            }
+            if (!isInventoryClosed && "accessorKey" in column && column.accessorKey === "inventorySum") {
+                return false;
+            }
+            if (!isInventoryClosed && "id" in column && column.id === "inventorySum") {
                 return false;
             }
             return true;

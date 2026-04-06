@@ -1,5 +1,6 @@
 import "server-only";
 
+import { calculateInventorySum } from "@/lib/inventory/sum";
 import prisma from "@/lib/prisma";
 
 export async function readActiveInventoryDb(userId: string) {
@@ -45,7 +46,7 @@ export async function readInventoryListDb(userId: string) {
 }
 
 export async function readInventoryItemsDb(inventoryId: number) {
-    return prisma.item.findMany({
+    const items = await prisma.item.findMany({
         where: {
             isInventoryItem: true,
         },
@@ -69,6 +70,27 @@ export async function readInventoryItemsDb(inventoryId: number) {
         orderBy: {
             name: "asc",
         },
+    });
+
+    return items.map((item) => {
+        const inventoryItem = item.inventoryItems[0];
+
+        return {
+            id: item.id,
+            name: item.name,
+            unit: item.unit,
+            packageSize: item.packageSize,
+            inventoryCount: inventoryItem?.count ?? null,
+            inventoryPackage: inventoryItem?.package ?? null,
+            inventoryPartial: inventoryItem?.partial ?? null,
+            inventorySum: calculateInventorySum({
+                count: inventoryItem?.count,
+                packageSize: item.packageSize,
+                packageCount: inventoryItem?.package,
+                partial: inventoryItem?.partial,
+            }),
+            hasNoInventoryItem: !inventoryItem,
+        };
     });
 }
 

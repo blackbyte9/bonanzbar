@@ -1,6 +1,7 @@
 import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
 import { readInventoryByIdDb, readInventoryItemsDb } from "@/lib/inventory/server/read";
 import { completeInventoryDb, upsertInventoryItemValuesDb } from "@/lib/inventory/server/update";
+import { calculateInventorySum } from "@/lib/inventory/sum";
 import { UserRole } from "@/prisma/enums";
 import { NextResponse } from "next/server";
 
@@ -103,20 +104,7 @@ export async function GET(request: Request, context: RouteContext) {
         inventory: inventory
             ? { id: inventory.id, startDate: inventory.startDate, endDate: inventory.endDate }
             : null,
-        items: items.map((item) => {
-            const inventoryItem = item.inventoryItems[0];
-
-            return {
-                id: item.id,
-                name: item.name,
-                unit: item.unit,
-                packageSize: item.packageSize,
-                inventoryCount: inventoryItem?.count ?? null,
-                inventoryPackage: inventoryItem?.package ?? null,
-                inventoryPartial: inventoryItem?.partial ?? null,
-                hasNoInventoryItem: !inventoryItem,
-            };
-        }),
+        items,
     });
 }
 
@@ -173,6 +161,12 @@ export async function PATCH(request: Request, context: RouteContext) {
             inventoryCount: savedInventoryItem.count,
             inventoryPackage: savedInventoryItem.package,
             inventoryPartial: savedInventoryItem.partial,
+            inventorySum: calculateInventorySum({
+                count: savedInventoryItem.count,
+                packageSize: updateResult.packageSize,
+                packageCount: savedInventoryItem.package,
+                partial: savedInventoryItem.partial,
+            }),
             hasNoInventoryItem: false,
         },
     });

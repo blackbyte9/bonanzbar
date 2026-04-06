@@ -20,6 +20,7 @@ export type InventoryItemListItem = {
     inventoryCount: number | null;
     inventoryPackage: number | null;
     inventoryPartial: number | null;
+    inventorySum: number;
     hasNoInventoryItem: boolean;
 };
 

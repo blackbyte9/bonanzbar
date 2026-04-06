@@ -17,6 +17,7 @@ function mapToInventoryListColumns(item: InventoryItemListItem): InventoryListCo
         inventoryCount: item.inventoryCount,
         inventoryPackage: item.inventoryPackage,
         inventoryPartial: item.inventoryPartial,
+        inventorySum: item.inventorySum,
         hasNoInventoryItem: item.hasNoInventoryItem,
     };
 }
@@ -30,6 +31,7 @@ function toInventoryListSignatureItem(item: InventoryListColumns) {
         inventoryCount: item.inventoryCount,
         inventoryPackage: item.inventoryPackage,
         inventoryPartial: item.inventoryPartial,
+        inventorySum: item.inventorySum,
         hasNoInventoryItem: item.hasNoInventoryItem,
     };
 }

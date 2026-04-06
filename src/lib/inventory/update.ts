@@ -34,6 +34,7 @@ export type UpdatedInventoryItemResponse = {
     inventoryCount: number | null;
     inventoryPackage: number | null;
     inventoryPartial: number | null;
+    inventorySum: number;
     hasNoInventoryItem: boolean;
 };
 

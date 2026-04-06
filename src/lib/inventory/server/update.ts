@@ -31,6 +31,7 @@ export async function upsertInventoryItemValuesDb(params: {
         },
         select: {
             id: true,
+            packageSize: true,
         },
     });
 
@@ -83,6 +84,7 @@ export async function upsertInventoryItemValuesDb(params: {
 
     return {
         kind: "ok" as const,
+        packageSize: item.packageSize,
         savedInventoryItem,
     };
 }
