@@ -8,8 +8,9 @@
   "cSpell.words": [
     "Bonanzbar",
     "datatable",
+    "Packungsgröße",
     "userlist"
-],
+  ],
   "cSpell.ignorePaths": [
     ".gitignore",
     "tsconfig.json",

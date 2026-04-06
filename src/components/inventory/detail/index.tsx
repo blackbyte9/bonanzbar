@@ -1,7 +1,6 @@
 "use client";
 
 import TablePageShell from "@/components/generic/datatable/tablePageShell";
-import InventoryList from "@/components/inventory/list";
 import { loadActiveInventory, type ActiveInventory } from "@/lib/inventory/read";
 import { Button } from "@/shadcn/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -82,10 +81,6 @@ export default function InventoryDetail() {
                     Inventur wechseln
                 </Button>
             </div>
-
-            <section>
-                <InventoryList inventoryId={activeInventory?.id ?? null} />
-            </section>
         </TablePageShell>
     );
 }

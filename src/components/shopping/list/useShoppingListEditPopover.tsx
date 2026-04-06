@@ -15,8 +15,8 @@ import { Button } from "@/shadcn/components/ui/button";
 import ComboboxField from "@/components/generic/form/comboboxField";
 import { updateShoppingListItem } from "@/lib/shopping/update";
 import type { ShoppingColumns } from "./columns";
-import { mapToShoppingColumns } from "./addItem";
-import { useShoppingItemMetadata } from "./useShoppingItemMetadata";
+import { mapToShoppingColumns } from "./mapper";
+import { useShoppingItemMetadata } from "@/components/shopping/add/useShoppingItemMetadata";
 
 type UseShoppingListEditPopoverParams = {
     canEditItems: boolean;

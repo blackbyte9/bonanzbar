@@ -3,7 +3,7 @@
 import { usePollingTableData } from "@/components/generic/datatable/usePollingTableData";
 import { loadShoppingList } from "@/lib/shopping/read";
 import { createListSignature } from "@/lib/collections/createListSignature";
-import { mapToShoppingColumns } from "./addItem";
+import { mapToShoppingColumns } from "./mapper";
 import type { ShoppingColumns } from "./columns";
 
 const SHOPPING_LIST_POLL_INTERVAL_MS = 60_000;

@@ -1,29 +1,32 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type Dispatch, type SetStateAction } from "react";
 import GenericDataTable from "@/components/generic/datatable";
-import { getDisplayColumnsForShoppingList } from "./columns";
-import { AddShoppingItemForm } from "./addItem";
+import { getDisplayColumnsForShoppingList, type ShoppingColumns } from "./columns";
 import { useSession } from "@/lib/auth/client";
-import TablePageShell from "@/components/generic/datatable/tablePageShell";
 import { useShoppingListEditPopover } from "./useShoppingListEditPopover";
 import { useMediaQuery } from "@/lib/browser/useMediaQuery";
-import { useShoppingListData } from "./useShoppingListData";
 import { useShoppingListMarkDoneAction } from "./useShoppingListMarkDoneAction";
 
 const SMALL_DISPLAY_MEDIA_QUERY = "(max-width: 640px)";
 
-export default function ShoppingList() {
+type ShoppingListProps = {
+    shoppingItems: ShoppingColumns[];
+    setShoppingItemsAction: Dispatch<SetStateAction<ShoppingColumns[]>>;
+    isLoading: boolean;
+    error: string | null;
+    setErrorAction: Dispatch<SetStateAction<string | null>>;
+};
+
+export default function ShoppingList({
+    shoppingItems,
+    setShoppingItemsAction: setShoppingItems,
+    isLoading,
+    error,
+    setErrorAction: setError,
+}: ShoppingListProps) {
     const { data: session, isPending: isSessionLoading } = useSession();
     const isSmallDisplay = useMediaQuery(SMALL_DISPLAY_MEDIA_QUERY);
-    const {
-        data: shoppingItems,
-        setData: setShoppingItems,
-        isLoading,
-        error,
-        setError,
-    } = useShoppingListData();
-    const canAddItems = !isSessionLoading && session?.user?.role !== "GUEST";
     const canMarkDone = !isSessionLoading && session?.user?.role !== "GUEST";
     const canEditItems = !isSessionLoading && session?.user?.role !== "GUEST";
 
@@ -55,11 +58,7 @@ export default function ShoppingList() {
     }, [canMarkDone, handleMarkDone, isMarkDoneLoading, isSmallDisplay]);
 
     return (
-        <TablePageShell title="Einkaufsartikel">
-            {canAddItems ? (
-                <AddShoppingItemForm setErrorAction={setError} setShoppingItemsAction={setShoppingItems} />
-            ) : null}
-
+        <>
             <GenericDataTable
                 columns={columns}
                 data={shoppingItems}
@@ -72,6 +71,6 @@ export default function ShoppingList() {
                 skeletonRowCount={6}
             />
             {editPopoverNode}
-        </TablePageShell>
+        </>
     );
 }

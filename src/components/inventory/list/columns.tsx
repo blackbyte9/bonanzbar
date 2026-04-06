@@ -62,6 +62,12 @@ export function getDisplayColumnsForInventoryList({
 
     return allColumns
         .filter((column) => {
+            if ("accessorKey" in column && column.accessorKey === "unit") {
+                return false;
+            }
+            if ("id" in column && column.id === "unit") {
+                return false;
+            }
             if ("accessorKey" in column && column.accessorKey === "packageSize") {
                 return false;
             }

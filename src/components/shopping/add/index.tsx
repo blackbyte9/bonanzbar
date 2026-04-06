@@ -1,23 +1,13 @@
 "use client";
 
-import { createShoppingListItem } from "@/lib/shopping/create";
-import { ShoppingListItem } from "@/lib/shopping/read";
-import { Button } from "@/shadcn/components/ui/button";
 import { useEffect, useMemo, useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
-import { toast } from "sonner";
-import type { ShoppingColumns } from "./columns";
 import ComboboxField from "@/components/generic/form/comboboxField";
+import { mapToShoppingColumns } from "@/components/shopping/list/mapper";
+import type { ShoppingColumns } from "@/components/shopping/list/columns";
+import { createShoppingListItem } from "@/lib/shopping/create";
+import { Button } from "@/shadcn/components/ui/button";
+import { toast } from "sonner";
 import { useShoppingItemMetadata } from "./useShoppingItemMetadata";
-
-function mapToShoppingColumns(item: ShoppingListItem): ShoppingColumns {
-    return {
-        id: item.id,
-        name: item.name,
-        count: item.count,
-        unit: item.unit,
-        userName: item.user?.name ?? null,
-    };
-}
 
 type ExecuteAddItemActionParams = {
     name: string;
@@ -199,5 +189,3 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
         </form>
     );
 }
-
-export { mapToShoppingColumns };
