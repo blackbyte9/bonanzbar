@@ -1,4 +1,26 @@
 
+export async function completeInventory(inventoryId: number): Promise<{ endDate: string }> {
+    const response = await fetch(`/api/inventory/${inventoryId}`, {
+        method: "POST",
+    });
+
+    if (response.status === 409) {
+        throw new Error("Inventur ist bereits abgeschlossen.");
+    }
+
+    if (!response.ok) {
+        throw new Error("Fehler beim Abschließen der Inventur.");
+    }
+
+    const payload = (await response.json()) as { endDate?: string };
+
+    if (!payload.endDate) {
+        throw new Error("Fehler beim Abrufen des Abschlussdatums.");
+    }
+
+    return { endDate: payload.endDate };
+}
+
 export type UpdateInventoryItemInput = {
     inventoryId: number;
     itemId: number;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, type Dispatch, type MouseEvent, type ReactNode, type SetStateAction } from "react";
+import { useCallback, useEffect, useMemo, useState, type MouseEvent, type ReactNode } from "react";
 import type { Row } from "@tanstack/react-table";
 import { toast } from "sonner";
 import {
@@ -14,7 +14,7 @@ import {
 import { Button } from "@/shadcn/components/ui/button";
 import ComboboxField from "@/components/generic/form/comboboxField";
 import { updateShoppingListItem } from "@/lib/shopping/update";
-import type { ShoppingColumns } from "./columns";
+import type { SetShoppingErrorAction, SetShoppingItemsAction, ShoppingColumns } from "@/components/shopping/types";
 import { mapToShoppingColumns } from "./mapper";
 import { useShoppingItemMetadata } from "@/components/shopping/add/useShoppingItemMetadata";
 
@@ -22,8 +22,8 @@ type UseShoppingListEditPopoverParams = {
     canEditItems: boolean;
     canMarkDone: boolean;
     shoppingItems: ShoppingColumns[];
-    setErrorAction: Dispatch<SetStateAction<string | null>>;
-    setShoppingItemsAction: Dispatch<SetStateAction<ShoppingColumns[]>>;
+    setErrorAction: SetShoppingErrorAction;
+    setShoppingItemsAction: SetShoppingItemsAction;
     isMarkDoneLoadingAction: (id: number) => boolean;
     onMarkDoneAction: (id: number) => Promise<void>;
 };

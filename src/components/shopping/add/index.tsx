@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import ComboboxField from "@/components/generic/form/comboboxField";
 import { mapToShoppingColumns } from "@/components/shopping/list/mapper";
-import type { ShoppingColumns } from "@/components/shopping/list/columns";
+import type { SetShoppingErrorAction, SetShoppingItemsAction } from "@/components/shopping/types";
 import { createShoppingListItem } from "@/lib/shopping/create";
 import { Button } from "@/shadcn/components/ui/button";
 import { toast } from "sonner";
@@ -14,8 +14,8 @@ type ExecuteAddItemActionParams = {
     count: string;
     unit: string;
     setIsAddingAction: Dispatch<SetStateAction<boolean>>;
-    setErrorAction: Dispatch<SetStateAction<string | null>>;
-    setShoppingItemsAction: Dispatch<SetStateAction<ShoppingColumns[]>>;
+    setErrorAction: SetShoppingErrorAction;
+    setShoppingItemsAction: SetShoppingItemsAction;
     setNameAction: Dispatch<SetStateAction<string>>;
     setCountAction: Dispatch<SetStateAction<string>>;
     setUnitAction: Dispatch<SetStateAction<string>>;
@@ -73,8 +73,8 @@ export async function executeAddItemAction({
 }
 
 type AddShoppingItemFormProps = {
-    setErrorAction: Dispatch<SetStateAction<string | null>>;
-    setShoppingItemsAction: Dispatch<SetStateAction<ShoppingColumns[]>>;
+    setErrorAction: SetShoppingErrorAction;
+    setShoppingItemsAction: SetShoppingItemsAction;
 };
 
 export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItemsAction: setShoppingItems }: AddShoppingItemFormProps) {

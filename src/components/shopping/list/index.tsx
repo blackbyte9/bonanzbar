@@ -1,21 +1,22 @@
 "use client";
 
-import { useMemo, type Dispatch, type SetStateAction } from "react";
+import { useMemo } from "react";
 import GenericDataTable from "@/components/generic/datatable";
-import { getDisplayColumnsForShoppingList, type ShoppingColumns } from "./columns";
+import { getDisplayColumnsForShoppingList } from "./columns";
 import { useSession } from "@/lib/auth/client";
 import { useShoppingListEditPopover } from "./useShoppingListEditPopover";
 import { useMediaQuery } from "@/lib/browser/useMediaQuery";
 import { useShoppingListMarkDoneAction } from "./useShoppingListMarkDoneAction";
+import type { SetShoppingErrorAction, SetShoppingItemsAction, ShoppingColumns } from "@/components/shopping/types";
 
 const SMALL_DISPLAY_MEDIA_QUERY = "(max-width: 640px)";
 
 type ShoppingListProps = {
     shoppingItems: ShoppingColumns[];
-    setShoppingItemsAction: Dispatch<SetStateAction<ShoppingColumns[]>>;
+    setShoppingItemsAction: SetShoppingItemsAction;
     isLoading: boolean;
     error: string | null;
-    setErrorAction: Dispatch<SetStateAction<string | null>>;
+    setErrorAction: SetShoppingErrorAction;
 };
 
 export default function ShoppingList({

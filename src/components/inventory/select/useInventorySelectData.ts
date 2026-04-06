@@ -3,7 +3,7 @@
 import { usePollingTableData } from "@/components/generic/datatable/usePollingTableData";
 import { createListSignature } from "@/lib/collections/createListSignature";
 import { loadInventoryList } from "@/lib/inventory/read";
-import { mapToInventoryColumns } from "./addInventory";
+import { mapToInventoryColumns } from "@/components/inventory/add";
 import type { InventoryColumns } from "./columns";
 
 const INVENTORY_POLL_INTERVAL_MS = 60_000;

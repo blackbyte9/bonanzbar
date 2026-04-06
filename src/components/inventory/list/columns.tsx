@@ -35,17 +35,17 @@ export function getColumnsForInventoryList(): ColumnDef<InventoryListColumns>[] 
         },
         {
             accessorKey: "inventoryCount",
-            header: "Anzahl",
+            header: "Einzel",
             cell: ({ row }) => row.original.inventoryCount ?? "-",
         },
         {
             accessorKey: "inventoryPackage",
-            header: "Packungen",
+            header: "Pack",
             cell: ({ row }) => row.original.inventoryPackage ?? "-",
         },
         {
             accessorKey: "inventoryPartial",
-            header: "Teilmenge",
+            header: "Teil",
             cell: ({ row }) => row.original.inventoryPartial ?? "-",
         },
     ];

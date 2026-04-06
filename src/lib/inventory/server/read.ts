@@ -16,6 +16,17 @@ export async function readActiveInventoryDb(userId: string) {
     });
 }
 
+export async function readInventoryByIdDb(inventoryId: number) {
+    return prisma.inventoryDates.findUnique({
+        where: { id: inventoryId },
+        select: {
+            id: true,
+            startDate: true,
+            endDate: true,
+        },
+    });
+}
+
 export async function readInventoryListDb(userId: string) {
     return prisma.inventoryDates.findMany({
         where: {
@@ -28,7 +39,7 @@ export async function readInventoryListDb(userId: string) {
             createdAt: true,
         },
         orderBy: {
-            createdAt: "desc",
+            startDate: "desc",
         },
     });
 }

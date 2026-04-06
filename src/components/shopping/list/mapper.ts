@@ -1,5 +1,5 @@
 import type { ShoppingListItem } from "@/lib/shopping/read";
-import type { ShoppingColumns } from "./columns";
+import type { ShoppingColumns } from "@/components/shopping/types";
 
 export function mapToShoppingColumns(item: ShoppingListItem): ShoppingColumns {
     return {

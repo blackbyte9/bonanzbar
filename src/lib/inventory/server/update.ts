@@ -86,3 +86,34 @@ export async function upsertInventoryItemValuesDb(params: {
         savedInventoryItem,
     };
 }
+
+export async function completeInventoryDb(inventoryId: number, userId: string) {
+    const inventory = await prisma.inventoryDates.findFirst({
+        where: {
+            id: inventoryId,
+            userId,
+        },
+        select: {
+            id: true,
+            endDate: true,
+        },
+    });
+
+    if (!inventory) {
+        return { kind: "inventory-not-found" as const };
+    }
+
+    if (inventory.endDate !== null) {
+        return { kind: "already-completed" as const };
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    const updated = await prisma.inventoryDates.update({
+        where: { id: inventoryId },
+        data: { endDate: today },
+        select: { id: true, endDate: true },
+    });
+
+    return { kind: "ok" as const, inventory: updated };
+}

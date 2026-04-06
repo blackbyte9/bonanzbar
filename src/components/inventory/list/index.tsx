@@ -11,9 +11,10 @@ const SMALL_DISPLAY_MEDIA_QUERY = "(max-width: 640px)";
 
 type InventoryListProps = {
     inventoryId: number | null;
+    isReadOnly?: boolean;
 };
 
-export default function InventoryList({ inventoryId }: InventoryListProps) {
+export default function InventoryList({ inventoryId, isReadOnly = false }: InventoryListProps) {
     const isSmallDisplay = useMediaQuery(SMALL_DISPLAY_MEDIA_QUERY);
     const {
         data: inventoryItems,
@@ -47,7 +48,7 @@ export default function InventoryList({ inventoryId }: InventoryListProps) {
                 loadingMessage="Lade Inventurartikel..."
                 loadingVariant="skeleton"
                 skeletonRowCount={6}
-                rowClickHandler={rowClickHandler}
+                rowClickHandler={isReadOnly ? undefined : rowClickHandler}
                 rowClassNameResolver={(row) => row.original.hasNoInventoryItem ? "bg-red-50/70" : undefined}
             />
             {editSheetNode}

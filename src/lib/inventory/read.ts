@@ -59,6 +59,24 @@ export async function loadInventoryList(): Promise<InventoryListItem[]> {
     return payload.inventories ?? [];
 }
 
+export async function loadInventoryById(inventoryId: number): Promise<ActiveInventory | null> {
+    const response = await fetch(`/api/inventory/${inventoryId}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        cache: "no-store",
+    });
+
+    if (!response.ok) {
+        throw new Error("Fehler beim Laden der Inventur.");
+    }
+
+    const payload = (await response.json()) as { inventory?: ActiveInventory | null };
+
+    return payload.inventory ?? null;
+}
+
 export async function loadInventoryItems(inventoryId: number): Promise<InventoryItemListItem[]> {
     const response = await fetch(`/api/inventory/${inventoryId}`, {
         method: "GET",

@@ -2,16 +2,11 @@
 
 import type { CellContext, ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/shadcn/components/ui/button";
+import type { ShoppingColumns } from "@/components/shopping/types";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type ShoppingColumns = {
-    id: number
-    name: string
-    count: number
-    unit: string | null
-    userName: string | null
-}
+export type { ShoppingColumns };
 
 type ShoppingColumnsOptions = {
     canMarkDone: boolean;

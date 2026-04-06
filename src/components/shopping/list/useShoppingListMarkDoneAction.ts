@@ -1,15 +1,15 @@
 "use client";
 
-import { useCallback, type Dispatch, type SetStateAction } from "react";
+import { useCallback } from "react";
 import { toast } from "sonner";
 import { markShoppingListItemDone } from "@/lib/shopping/update";
 import { usePendingIds } from "@/lib/async/usePendingIds";
-import type { ShoppingColumns } from "./columns";
+import type { SetShoppingErrorAction, SetShoppingItemsAction, ShoppingColumns } from "@/components/shopping/types";
 
 type UseShoppingListMarkDoneActionParams = {
     canMarkDone: boolean;
-    setErrorAction: Dispatch<SetStateAction<string | null>>;
-    setShoppingItemsAction: Dispatch<SetStateAction<ShoppingColumns[]>>;
+    setErrorAction: SetShoppingErrorAction;
+    setShoppingItemsAction: SetShoppingItemsAction;
 };
 
 type UseShoppingListMarkDoneActionResult = {

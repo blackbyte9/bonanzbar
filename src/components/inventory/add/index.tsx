@@ -1,14 +1,14 @@
 "use client";
 
 import { createInventory } from "@/lib/inventory/create";
-import { InventoryListItem } from "@/lib/inventory/read";
+import type { InventoryListItem } from "@/lib/inventory/read";
 import { Button } from "@/shadcn/components/ui/button";
 import { Input } from "@/shadcn/components/ui/input";
 import { useCallback, useState, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import { toast } from "sonner";
-import type { InventoryColumns } from "./columns";
+import type { InventoryColumns } from "@/components/inventory/select/columns";
 
-function mapToInventoryColumns(item: InventoryListItem): InventoryColumns {
+export function mapToInventoryColumns(item: InventoryListItem): InventoryColumns {
     return {
         id: item.id,
         startDate: item.startDate,
@@ -111,5 +111,3 @@ export function AddInventoryForm({
         </form>
     );
 }
-
-export { mapToInventoryColumns };

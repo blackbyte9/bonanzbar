@@ -1,10 +1,12 @@
 "use client";
 
 import TablePageShell from "@/components/generic/datatable/tablePageShell";
-import { loadActiveInventory, type ActiveInventory } from "@/lib/inventory/read";
+import type { ActiveInventory } from "@/lib/inventory/read";
+import { completeInventory } from "@/lib/inventory/update";
 import { Button } from "@/shadcn/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const inventoryDateFormatter = new Intl.DateTimeFormat("de-DE");
@@ -17,25 +19,32 @@ function formatInventoryDate(date: string | null): string {
     return inventoryDateFormatter.format(new Date(date));
 }
 
-export default function InventoryDetail() {
-    const [activeInventory, setActiveInventory] = useState<ActiveInventory | null>(null);
-    const [isInventoryLoading, setIsInventoryLoading] = useState(true);
+type InventoryDetailProps = {
+    activeInventory: ActiveInventory | null;
+    isInventoryLoading: boolean;
+};
 
-    useEffect(() => {
-        const fetchActiveInventory = async () => {
-            try {
-                const inventory = await loadActiveInventory();
+export default function InventoryDetail({ activeInventory, isInventoryLoading }: InventoryDetailProps) {
+    const [isCompleting, setIsCompleting] = useState(false);
+    const router = useRouter();
 
-                setActiveInventory(inventory);
-            } catch {
-                toast.error("Konnte die aktive Inventur nicht laden.");
-            } finally {
-                setIsInventoryLoading(false);
-            }
-        };
+    async function handleCompleteInventory() {
+        if (!activeInventory || isCompleting) {
+            return;
+        }
 
-        fetchActiveInventory();
-    }, []);
+        setIsCompleting(true);
+
+        try {
+            await completeInventory(activeInventory.id);
+            toast.success("Inventur erfolgreich abgeschlossen.");
+            router.push("/inventory/select");
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Fehler beim Abschließen der Inventur.");
+        } finally {
+            setIsCompleting(false);
+        }
+    }
 
     if (isInventoryLoading) {
         return (
@@ -72,7 +81,7 @@ export default function InventoryDetail() {
                 )}
             </section>
 
-            <div className="mb-6">
+            <div className="mb-6 flex flex-wrap gap-2">
                 <Button onClick={() => {
                     if (activeInventory) {
                         window.location.href = `/inventory/select`;
@@ -80,6 +89,22 @@ export default function InventoryDetail() {
                 }}>
                     Inventur wechseln
                 </Button>
+                {activeInventory && activeInventory.endDate === null ? (
+                    <Button
+                        variant="destructive"
+                        onClick={() => void handleCompleteInventory()}
+                        disabled={isCompleting}
+                    >
+                        {isCompleting ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Abschließen...
+                            </>
+                        ) : (
+                            "Inventur abschließen"
+                        )}
+                    </Button>
+                ) : null}
             </div>
         </TablePageShell>
     );

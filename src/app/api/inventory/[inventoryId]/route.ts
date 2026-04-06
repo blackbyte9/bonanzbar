@@ -1,11 +1,12 @@
 import { isApiAuthFailure, requireApiAuth } from "@/lib/auth/apiAuth";
-import { readInventoryItemsDb } from "@/lib/inventory/server/read";
-import { upsertInventoryItemValuesDb } from "@/lib/inventory/server/update";
+import { readInventoryByIdDb, readInventoryItemsDb } from "@/lib/inventory/server/read";
+import { completeInventoryDb, upsertInventoryItemValuesDb } from "@/lib/inventory/server/update";
 import { UserRole } from "@/prisma/enums";
 import { NextResponse } from "next/server";
 
 const ALLOWED_GET_ROLES = [UserRole.ADMIN, UserRole.ORGANIZER, UserRole.USER] as const;
 const ALLOWED_PATCH_ROLES = [UserRole.ADMIN, UserRole.ORGANIZER, UserRole.USER] as const;
+const ALLOWED_POST_ROLES = [UserRole.ADMIN, UserRole.ORGANIZER] as const;
 
 type RouteContext = {
     params: Promise<{ inventoryId: string }>;
@@ -93,9 +94,15 @@ export async function GET(request: Request, context: RouteContext) {
         return NextResponse.json({ error: "Invalid inventory id" }, { status: 400 });
     }
 
-    const items = await readInventoryItemsDb(parsedInventoryId);
+    const [inventory, items] = await Promise.all([
+        readInventoryByIdDb(parsedInventoryId),
+        readInventoryItemsDb(parsedInventoryId),
+    ]);
 
     return NextResponse.json({
+        inventory: inventory
+            ? { id: inventory.id, startDate: inventory.startDate, endDate: inventory.endDate }
+            : null,
         items: items.map((item) => {
             const inventoryItem = item.inventoryItems[0];
 
@@ -169,4 +176,31 @@ export async function PATCH(request: Request, context: RouteContext) {
             hasNoInventoryItem: false,
         },
     });
+}
+
+export async function POST(_request: Request, context: RouteContext) {
+    const authResult = await requireApiAuth(ALLOWED_POST_ROLES);
+
+    if (isApiAuthFailure(authResult)) {
+        return authResult.response;
+    }
+
+    const { inventoryId } = await context.params;
+    const parsedInventoryId = Number(inventoryId);
+
+    if (!Number.isInteger(parsedInventoryId) || parsedInventoryId <= 0) {
+        return NextResponse.json({ error: "Invalid inventory id" }, { status: 400 });
+    }
+
+    const result = await completeInventoryDb(parsedInventoryId, authResult.userId);
+
+    if (result.kind === "inventory-not-found") {
+        return NextResponse.json({ error: "Inventory not found" }, { status: 404 });
+    }
+
+    if (result.kind === "already-completed") {
+        return NextResponse.json({ error: "Inventory already completed" }, { status: 409 });
+    }
+
+    return NextResponse.json({ endDate: result.inventory.endDate });
 }

@@ -4,7 +4,7 @@ import GenericDataTable from "@/components/generic/datatable";
 import { getDisplayColumnsForInventoryList } from "./columns";
 import TablePageShell from "@/components/generic/datatable/tablePageShell";
 import { useRouter } from "next/navigation";
-import { AddInventoryForm } from "./addInventory";
+import { AddInventoryForm } from "@/components/inventory/add";
 import { useInventorySelectData } from "./useInventorySelectData";
 import { useInventorySelectAction } from "./useInventorySelectAction";
 
