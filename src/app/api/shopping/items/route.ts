@@ -12,11 +12,14 @@ export async function GET() {
         return authResult.response;
     }
 
-    const items = await prisma.shoppingItems.findMany({
+    const items = await prisma.item.findMany({
         select: {
             name: true,
-            count: true,
-            unit: true,
+            shoppingUnit: {
+                select: {
+                    name: true,
+                },
+            },
             updatedAt: true,
         },
         orderBy: {
@@ -24,7 +27,7 @@ export async function GET() {
         },
     });
 
-    const uniqueItemsByName = new Map<string, { name: string; count: number; unit: string | null }>();
+    const uniqueItemsByName = new Map<string, { name: string; defaultUnit: string | null }>();
 
     for (const item of items) {
         const normalizedName = item.name.trim().toLocaleLowerCase();
@@ -35,8 +38,7 @@ export async function GET() {
 
         uniqueItemsByName.set(normalizedName, {
             name: item.name,
-            count: item.count,
-            unit: item.unit,
+            defaultUnit: item.shoppingUnit?.name ?? null,
         });
     }
 

@@ -115,20 +115,9 @@ model ShoppingUnits {
 
   name      String
   shortName String?
+  items     Item[]
 
   @@map("shoppingunits")
-}
-
-model ShoppingItems {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  name  String
-  count Int     @default(0)
-  unit  String?
-
-  @@map("shoppingitems")
 }
 
 // ######### inventory models #########
@@ -179,6 +168,8 @@ model Item {
   packageSize     Int?            @default(1)
   isInventoryItem Boolean         @default(false)
   inventoryItems  InventoryItem[]
+  shoppingUnitId  Int?
+  shoppingUnit    ShoppingUnits?  @relation(fields: [shoppingUnitId], references: [id], onDelete: SetNull)
 
   @@map("item")
 }

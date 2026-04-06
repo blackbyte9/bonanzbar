@@ -116,8 +116,7 @@ export function AddShoppingItemForm({ setErrorAction: setError, setShoppingItems
         }
 
         setTimeout(() => {
-            setCount(String(selectedPreset.count));
-            setUnit(selectedPreset.unit ?? "");
+            setUnit(selectedPreset.defaultUnit ?? "");
         }, 0);
     }, [selectedPreset]);
 

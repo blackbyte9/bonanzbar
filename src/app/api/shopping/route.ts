@@ -64,8 +64,8 @@ async function ensureShoppingUnitExists(unit: string | null): Promise<void> {
     }
 }
 
-async function saveShoppingItemPreset(name: string, count: number, unit: string | null): Promise<void> {
-    const existingPreset = await prisma.shoppingItems.findFirst({
+async function upsertItemForShopping(name: string, unit: string | null): Promise<void> {
+    const existingItem = await prisma.item.findFirst({
         where: {
             name: {
                 equals: name,
@@ -74,28 +74,41 @@ async function saveShoppingItemPreset(name: string, count: number, unit: string 
         },
         select: {
             id: true,
+            name: true,
         },
     });
 
-    if (existingPreset) {
-        await prisma.shoppingItems.update({
+    const matchingUnit = unit
+        ? await prisma.shoppingUnits.findFirst({
             where: {
-                id: existingPreset.id,
+                name: unit,
+            },
+            select: {
+                id: true,
+            },
+        })
+        : null;
+
+    if (existingItem) {
+        await prisma.item.update({
+            where: {
+                id: existingItem.id,
             },
             data: {
                 name,
-                count,
                 unit,
+                shoppingUnitId: matchingUnit?.id ?? null,
             },
         });
         return;
     }
 
-    await prisma.shoppingItems.create({
+    await prisma.item.create({
         data: {
             name,
-            count,
             unit,
+            isInventoryItem: false,
+            shoppingUnitId: matchingUnit?.id ?? null,
         },
     });
 }
@@ -156,10 +169,8 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Ungültige Eingabe" }, { status: 400 });
     }
 
-    await Promise.all([
-        ensureShoppingUnitExists(parsedPayload.unit),
-        saveShoppingItemPreset(parsedPayload.name, parsedPayload.count, parsedPayload.unit),
-    ]);
+    await ensureShoppingUnitExists(parsedPayload.unit);
+    await upsertItemForShopping(parsedPayload.name, parsedPayload.unit);
 
     const item = await prisma.shoppingList.create({
         data: {

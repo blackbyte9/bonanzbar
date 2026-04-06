@@ -164,8 +164,7 @@ export function useShoppingListEditPopover({
             return;
         }
 
-        setEditCount(String(selectedPreset.count));
-        setEditUnit(selectedPreset.unit ?? "");
+        setEditUnit(selectedPreset.defaultUnit ?? "");
     }, [isEditPopoverOpen, selectedPreset]);
 
     useEffect(() => {

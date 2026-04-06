@@ -1,7 +1,6 @@
 export type ShoppingItemPreset = {
     name: string;
-    count: number;
-    unit: string | null;
+    defaultUnit: string | null;
 };
 
 export async function loadShoppingItems(): Promise<ShoppingItemPreset[]> {
