@@ -1,17 +1,12 @@
 "use client";
 
-import GenericDataTable from "@/components/generic/datatable";
 import TablePageShell from "@/components/generic/datatable/tablePageShell";
+import InventoryList from "@/components/inventory/list";
 import { loadActiveInventory, type ActiveInventory } from "@/lib/inventory/loadActiveInventory";
-import { useMediaQuery } from "@/lib/browser/useMediaQuery";
 import { Button } from "@/shadcn/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { getDisplayColumnsForInventoryDetail } from "./columns";
-import { useInventoryDetailData } from "./useInventoryDetailData";
-
-const SMALL_DISPLAY_MEDIA_QUERY = "(max-width: 640px)";
 
 const inventoryDateFormatter = new Intl.DateTimeFormat("de-DE");
 
@@ -26,18 +21,6 @@ function formatInventoryDate(date: string | null): string {
 export default function InventoryDetail() {
     const [activeInventory, setActiveInventory] = useState<ActiveInventory | null>(null);
     const [isInventoryLoading, setIsInventoryLoading] = useState(true);
-    const isSmallDisplay = useMediaQuery(SMALL_DISPLAY_MEDIA_QUERY);
-    const {
-        data: inventoryItems,
-        isLoading: isItemsLoading,
-        error: itemsError,
-    } = useInventoryDetailData();
-
-    const columns = useMemo(() => {
-        return getDisplayColumnsForInventoryDetail({
-            isSmallDisplay,
-        });
-    }, [isSmallDisplay]);
 
     useEffect(() => {
         const fetchActiveInventory = async () => {
@@ -101,16 +84,7 @@ export default function InventoryDetail() {
             </div>
 
             <section>
-                <GenericDataTable
-                    columns={columns}
-                    data={inventoryItems}
-                    emptyMessage="Keine Inventurartikel gefunden."
-                    isLoading={isItemsLoading}
-                    error={itemsError}
-                    loadingMessage="Lade Inventurartikel..."
-                    loadingVariant="skeleton"
-                    skeletonRowCount={6}
-                />
+                <InventoryList inventoryId={activeInventory?.id ?? null} />
             </section>
         </TablePageShell>
     );

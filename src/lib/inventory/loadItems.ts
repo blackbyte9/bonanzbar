@@ -3,10 +3,14 @@ export type InventoryItemListItem = {
     name: string;
     unit: string | null;
     packageSize: number | null;
+    inventoryCount: number | null;
+    inventoryPackage: number | null;
+    inventoryPartial: number | null;
+    hasNoInventoryItem: boolean;
 };
 
-export async function loadInventoryItems(): Promise<InventoryItemListItem[]> {
-    const response = await fetch("/api/inventory/items", {
+export async function loadInventoryItems(inventoryId: number): Promise<InventoryItemListItem[]> {
+    const response = await fetch(`/api/inventory/${inventoryId}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

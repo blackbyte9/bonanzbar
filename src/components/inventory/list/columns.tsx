@@ -2,18 +2,22 @@
 
 import type { CellContext, ColumnDef } from "@tanstack/react-table";
 
-export type InventoryDetailColumns = {
+export type InventoryListColumns = {
     id: number;
     name: string;
     unit: string | null;
     packageSize: number | null;
+    inventoryCount: number | null;
+    inventoryPackage: number | null;
+    inventoryPartial: number | null;
+    hasNoInventoryItem: boolean;
 };
 
-type InventoryDetailDisplayColumnsOptions = {
+type InventoryListDisplayColumnsOptions = {
     isSmallDisplay: boolean;
 };
 
-export function getColumnsForInventoryDetail(): ColumnDef<InventoryDetailColumns>[] {
+export function getColumnsForInventoryList(): ColumnDef<InventoryListColumns>[] {
     return [
         {
             accessorKey: "name",
@@ -29,13 +33,28 @@ export function getColumnsForInventoryDetail(): ColumnDef<InventoryDetailColumns
             header: "Packungsgröße",
             cell: ({ row }) => row.original.packageSize ?? 1,
         },
+        {
+            accessorKey: "inventoryCount",
+            header: "Anzahl",
+            cell: ({ row }) => row.original.inventoryCount ?? "-",
+        },
+        {
+            accessorKey: "inventoryPackage",
+            header: "Packungen",
+            cell: ({ row }) => row.original.inventoryPackage ?? "-",
+        },
+        {
+            accessorKey: "inventoryPartial",
+            header: "Teilmenge",
+            cell: ({ row }) => row.original.inventoryPartial ?? "-",
+        },
     ];
 }
 
-export function getDisplayColumnsForInventoryDetail({
+export function getDisplayColumnsForInventoryList({
     isSmallDisplay,
-}: InventoryDetailDisplayColumnsOptions): ColumnDef<InventoryDetailColumns>[] {
-    const allColumns = getColumnsForInventoryDetail();
+}: InventoryListDisplayColumnsOptions): ColumnDef<InventoryListColumns>[] {
+    const allColumns = getColumnsForInventoryList();
 
     if (!isSmallDisplay) {
         return allColumns;
@@ -49,16 +68,22 @@ export function getDisplayColumnsForInventoryDetail({
             if ("id" in column && column.id === "packageSize") {
                 return false;
             }
+            if ("accessorKey" in column && column.accessorKey === "inventoryPartial") {
+                return false;
+            }
+            if ("id" in column && column.id === "inventoryPartial") {
+                return false;
+            }
             return true;
         })
-        .map((column): ColumnDef<InventoryDetailColumns> => {
+        .map((column): ColumnDef<InventoryListColumns> => {
             const accessorKey = "accessorKey" in column ? column.accessorKey : undefined;
             const columnId = "id" in column ? column.id : undefined;
 
             if (accessorKey === "name" || columnId === "name") {
                 return {
                     ...column,
-                    cell: (info: CellContext<InventoryDetailColumns, unknown>) => (
+                    cell: (info: CellContext<InventoryListColumns, unknown>) => (
                         <span className="block w-full whitespace-normal wrap-break-word leading-snug">
                             {info.row.original.name}
                         </span>

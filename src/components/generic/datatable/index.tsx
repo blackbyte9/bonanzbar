@@ -28,6 +28,7 @@ interface GenericDataTableProps<TData, TValue> {
     loadingVariant?: "text" | "skeleton";
     skeletonRowCount?: number;
     rowClickHandler?: (row: Row<TData>, event: MouseEvent<HTMLTableRowElement>) => void;
+    rowClassNameResolver?: (row: Row<TData>) => string | undefined;
 }
 
 export default function GenericDataTable<TData, TValue>({
@@ -40,6 +41,7 @@ export default function GenericDataTable<TData, TValue>({
     loadingVariant = "text",
     skeletonRowCount = 5,
     rowClickHandler,
+    rowClassNameResolver,
 }: GenericDataTableProps<TData, TValue>) {
     // eslint-disable-next-line react-hooks/incompatible-library
     const table = useReactTable({
@@ -85,7 +87,7 @@ export default function GenericDataTable<TData, TValue>({
                             <TableRow
                                 key={row.id}
                                 data-state={row.getIsSelected() && "selected"}
-                                className={rowClickHandler ? "cursor-pointer" : undefined}
+                                className={`${rowClickHandler ? "cursor-pointer" : ""} ${rowClassNameResolver?.(row) ?? ""}`.trim() || undefined}
                                 onClick={rowClickHandler ? (event) => rowClickHandler(row, event) : undefined}
                             >
                                 {row.getVisibleCells().map((cell) => (
